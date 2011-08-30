@@ -7,7 +7,7 @@ CC = g++
 CWARN = -W -Wall -Wshadow -Wimplicit -Wreturn-type -Wcomment -Wtrigraphs -Wformat -Wparentheses -Wpointer-arith -Wuninitialized -O
 
 CDBG = -g $(CWARN) -fno-inline
-CFLAGS = -I$(INCDIR) $(CDBG)
+CFLAGS = -I$(INCDIR) -03  
 DFLAGS = -I$(INCDIR) -g $(CWARN) -fno-inline -DDEBUG=1
 
 CTAG = ctags
