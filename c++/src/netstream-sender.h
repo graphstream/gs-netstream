@@ -100,20 +100,22 @@ public:
   // ==================
   // = Element events =
   // ================== 
-  void addNode(const string & node_id);
-  void removeNode(const string & node_id);
-  void addEdge(const string & edge_id, const string & from_node, const string & to_node, bool directed);
-  void removeEdge(const string & edge_id);
-  void stepBegins(double timestamp);
-  void graphClear();
+  void addNode(const string & source_id, long time_id, const string & node_id);
+  void removeNode(const string & source_id, long time_id, const string & node_id);
+  void addEdge(const string & source_id, long time_id, const string & edge_id, const string & from_node, const string & to_node, bool directed);
+  void removeEdge(const string & source_id, long time_id, const string & edge_id);
+  void stepBegins(const string & source_id, long time_id, double timestamp);
+  void graphClear(const string & source_id, long time_id);
   
   // ====================
   // = Attribute events =
   // ====================
   template <typename T>
-  void addGraphAttribute(const string & attribute,  T value){
+  void addGraphAttribute(const string & source_id, long time_id, const string & attribute,  T value){
     Storage event = Storage();
     event.writeByte(EVENT_ADD_GRAPH_ATTR);
+    event.writeString(source_id);
+    event.writeLong(time_id);
     event.writeString(attribute);
     event.writeByte(getType(value));
     encode(event, value);
@@ -121,9 +123,11 @@ public:
   }
 
   template <typename T>
-  void changeGraphAttribute(const string & attribute, const T oldValue, const T newValue){
+  void changeGraphAttribute(const string & source_id, long time_id, const string & attribute, const T oldValue, const T newValue){
      Storage event = Storage();
      event.writeByte(EVENT_CHG_GRAPH_ATTR);
+     event.writeString(source_id);
+     event.writeLong(time_id);
      event.writeString(attribute);
      event.writeByte(getType(newValue));
      encode(event, oldValue);
@@ -131,12 +135,14 @@ public:
      _sendEvent(event);
   }
   
-  void removeGraphAttribute(const string & attribute);
+  void removeGraphAttribute(const string & source_id, long time_id, const string & attribute);
   
   template <typename T>
-  void addNodeAttribute(const string & node_id, const string & attribute, const T & value){
+  void addNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute, const T & value){
     Storage event = Storage();
     event.writeByte(EVENT_ADD_NODE_ATTR);
+    event.writeString(source_id);
+    event.writeLong(time_id);
     event.writeString(node_id);
     event.writeString(attribute);
     event.writeByte(getType(value));
@@ -145,9 +151,11 @@ public:
   }
 
   template <typename T>
-  void changeNodeAttribute(const string & node_id, const string & attribute, const T & oldValue, const T & newValue){
+  void changeNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute, const T & oldValue, const T & newValue){
     Storage event = Storage();
     event.writeByte(EVENT_CHG_NODE_ATTR);
+    event.writeString(source_id);
+    event.writeLong(time_id);
     event.writeString(node_id);
     event.writeString(attribute);
     event.writeByte(getType(newValue));
@@ -156,12 +164,14 @@ public:
     _sendEvent(event);
   }
   
-  void removeNodeAttribute(const string & node_id, const string & attribute);
+  void removeNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute);
   
   template <typename T>
-  void addEdgeAttribute(const string & edge_id, const string & attribute, const T & value){
+  void addEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute, const T & value){
     Storage event = Storage();
     event.writeByte(EVENT_ADD_EDGE_ATTR);
+    event.writeString(source_id);
+    event.writeLong(time_id);
     event.writeString(edge_id);
     event.writeString(attribute);
     event.writeByte(getType(value));
@@ -171,9 +181,11 @@ public:
   }
 
   template <typename T>
-  void changeEdgeAttribute(const string & edge_id, const string & attribute, const T & oldValue, const T & newValue){
+  void changeEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute, const T & oldValue, const T & newValue){
     Storage event = Storage();
     event.writeByte(EVENT_CHG_EDGE_ATTR);
+    event.writeString(source_id);
+    event.writeLong(time_id);
     event.writeString(edge_id);
     event.writeString(attribute);
     event.writeByte(getType(newValue));
@@ -182,7 +194,7 @@ public:
     _sendEvent(event);
   }
   
-  void removeEdgeAttribute(const string & edge_id, const string & attribute);
+  void removeEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute);
   
 };
 #endif

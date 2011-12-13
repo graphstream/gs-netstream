@@ -24,6 +24,7 @@ using namespace std;
 void events_test();
 void types_test();
 void example();
+void e();
 int main (int argc, char const *argv[])
 {
   //events_test();
@@ -33,18 +34,33 @@ int main (int argc, char const *argv[])
 }
 
 
+void e(){
+  string source_id="C++_netstream_test";
+  long time_id=0L;
+   NetStreamSender stream("default","10.91.100.76",2001,false);
+  string n1("node");
+  while(1) {
+        //stream.changeNodeAttribute(n1,att,old,n);
+        stream.addNode(source_id, time_id++, n1);
+  }
+}
+
+
+
 
 
 void example(){
+  string source_id("C++_netstream_test");
+  long time_id=0L;
   NetStreamSender stream("default","localhost",2001,false);
   string style("node{fill-mode:plain;fill-color:#567;size:6px;}");
-  stream.addGraphAttribute("stylesheet", style);
-  stream.addGraphAttribute("ui.antialias", true);
-  stream.addGraphAttribute("layout.stabilization-limit", 0);
+  stream.addGraphAttribute(source_id, time_id++, "stylesheet", style);
+  stream.addGraphAttribute(source_id, time_id++, "ui.antialias", true);
+  stream.addGraphAttribute(source_id, time_id++, "layout.stabilization-limit", 0);
   for (int i = 0; i < 500; i++) {
     stringstream n1;
     n1<<i;
-  stream.addNode(n1.str());
+  stream.addNode(source_id, time_id++, n1.str());
   if (i > 0) {
     
     
@@ -59,115 +75,70 @@ void example(){
     stringstream e2;
     e2<<n1.str()<<"-"<<n3.str();
     //cout<<"edge :"<<e1.str()<<endl;
-    stream.addEdge(e1.str(), n1.str(), n2.str(), false);
-    stream.addEdge(e2.str(), n1.str(), n3.str(), false);
+    stream.addEdge(source_id, time_id++, e1.str(), n1.str(), n2.str(), false);
+    stream.addEdge(source_id, time_id++, e2.str(), n1.str(), n3.str(), false);
   }
   }
 }
 
 void types_test(){
+  string source_id="C++_netstream_test";
+  long time_id=0L;
   NetStreamSender stream("default","localhost",2001,true);
   
   
-  stream.addGraphAttribute("int", 1);
-  stream.addGraphAttribute("float", (float)1);
-  stream.addGraphAttribute("double", 1.0);
-  stream.addGraphAttribute("long", 1L);
-  stream.addGraphAttribute("byte", (char) 0);
-  stream.addGraphAttribute("boolean", true);
+  stream.addGraphAttribute(source_id, time_id++, "int", 1);
+  stream.addGraphAttribute(source_id, time_id++, "float", (float)1);
+  stream.addGraphAttribute(source_id, time_id++, "double", 1.0);
+  stream.addGraphAttribute(source_id, time_id++, "long", 1L);
+  stream.addGraphAttribute(source_id, time_id++, "byte", (char) 0);
+  stream.addGraphAttribute(source_id, time_id++, "boolean", true);
 
   int v[] = {1776,7,4};
   vector<int> value(v,v+3);
-  stream.addGraphAttribute("intArray", value);
+  stream.addGraphAttribute(source_id, time_id++, "intArray", value);
   
   float v2[] = {(float)1776.3,(float)7.3};
   vector<float> value2(v2,v2+2);
-  stream.addGraphAttribute("floatArray", value2);
+  stream.addGraphAttribute(source_id, time_id++, "floatArray", value2);
 
   double v3[] = {776.3,.3};
   vector<double> value3(v3,v3+2);
-  stream.addGraphAttribute("doubleArray", value3);
+  stream.addGraphAttribute(source_id, time_id++, "doubleArray", value3);
   
   long int v4[] = {1776,7,4};
   vector<long int> value4(v4,v4+3);
-  stream.addGraphAttribute("longArray", value4);
+  stream.addGraphAttribute(source_id, time_id++, "longArray", value4);
 
   char v5[] = {'0',(char)0,'z'};
   vector<char> value5(v5,v5+3);
-  stream.addGraphAttribute("byteArray",value5 );
+  stream.addGraphAttribute(source_id, time_id++, "byteArray",value5 );
 
   bool v6[] = {true,false};
   vector<bool> value6(v6,v6+2);
-  stream.addGraphAttribute("booleanArray", value6);
+  stream.addGraphAttribute(source_id, time_id++, "booleanArray", value6);
   
-  stream.addGraphAttribute("string", string("true"));
+  stream.addGraphAttribute(source_id, time_id++, "string", string("true"));
 }
 
 void events_test(){
-  
+  string source_id="C++_netstream_test";
+  long time_id=0L;
   NetStreamSender stream("localhost", 2001);
-  stream.addNode("node0");
-  stream.addEdge("edge", "node0", "node1", true);
-  stream.addNodeAttribute("node0","nodeAttribute", 0);
-  stream.changeNodeAttribute("node0","nodeAttribute",0, 1);
-  stream.removeNodeAttribute("node0","nodeAttribute");
-  stream.addEdgeAttribute("edge","edgeAttribute", 0);
-  stream.changeEdgeAttribute("edge","edgeAttribute", 0,1);
-  stream.removeEdgeAttribute("edge","edgeAttribute");
-  stream.addGraphAttribute("graphAttribute", 0);
-  stream.changeGraphAttribute("graphAttribute", 0, 1);
-  stream.removeGraphAttribute("graphAttribute");
-  stream.stepBegins(1.1);
-  stream.removeEdge("edge");
-  stream.removeNode("node0");
-  stream.graphClear();
+  stream.addNode(source_id, time_id++, "node0");
+  stream.addEdge(source_id, time_id++, "edge", "node0", "node1", true);
+  stream.addNodeAttribute(source_id, time_id++, "node0","nodeAttribute", 0);
+  stream.changeNodeAttribute(source_id, time_id++, "node0","nodeAttribute",0, 1);
+  stream.removeNodeAttribute(source_id, time_id++, "node0","nodeAttribute");
+  stream.addEdgeAttribute(source_id, time_id++, "edge","edgeAttribute", 0);
+  stream.changeEdgeAttribute(source_id, time_id++, "edge","edgeAttribute", 0,1);
+  stream.removeEdgeAttribute(source_id, time_id++, "edge","edgeAttribute");
+  stream.addGraphAttribute(source_id, time_id++, "graphAttribute", 0);
+  stream.changeGraphAttribute(source_id, time_id++, "graphAttribute", 0, 1);
+  stream.removeGraphAttribute(source_id, time_id++, "graphAttribute");
+  stream.stepBegins(source_id, time_id++, 1.1);
+  stream.removeEdge(source_id, time_id++, "edge");
+  stream.removeNode(source_id, time_id++, "node0");
+  stream.graphClear(source_id, time_id++);
 }
 
-void crapy_test(){
-   //NetStreamSender stream =  NetStreamSender("default","localhost",2001);
-   //stream.nodeAdded("node");
-
-  string stream = "default";
-  
-  Socket socket = Socket("localhost",2001);
-
-  Storage _stream = Storage();
-  _stream.writeString(stream);
-
-  try
-  {
-    socket.connect();
-  }
-  catch (tcpip::SocketException &e)
-  {
-    cout << "#Error while connecting: " << e.what();
-    return ;
-  }
-
-  Storage event = Storage();
-  event.writeByte(EVENT_ADD_NODE);
-  event.writeString("node0");
-  
-  //Storage all = Storage();
-  //all.writeStorage(_stream);
-  //all.writeStorage(event);
-  //cout.setf ( ios::hex, ios::basefield );       // set hex as the basefield
-  //cout.setf ( ios::showbase );                  // activate showbase
-  for(Storage::StorageType::const_iterator it = event.begin(); it != event.end();){
-    cout<<(int)(*it)<<",";
-    it++;
-  }
-  cout<<endl;
-  try
-     {
-       socket.sendExact(_stream+event);
-     }
-     catch (SocketException &e)
-     {
-       cout << "Error while sending command: " << e.what();
-       return ;
-     }
-
-  socket.close();
-  
-}

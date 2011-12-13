@@ -159,16 +159,18 @@ class NetStreamSender(AttributeSink,ElementSink):
   # =========================
   # = AttributeSink methods =
   # =========================
-  def graphAttributeAdded(self, attribute, value):
+  def graphAttributeAdded(self, source_id, time_id, attribute, value):
     event= self._encodeByte(EVENT_ADD_GRAPH_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(attribute)
     type = self._getType(value) 
     event = event + self._encodeByte(type)
     event = event + self._encodeValue(value,type)
     self._send(event)
   
-  def graphAttributeChanged(self, attribute, old_value, new_value):
+  def graphAttributeChanged(self, source_id, time_id, attribute, old_value, new_value):
     event = self._encodeByte(EVENT_CHG_GRAPH_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(attribute)
     type = self._getType(old_value)
     event = event + self._encodeByte(type)
@@ -176,13 +178,15 @@ class NetStreamSender(AttributeSink,ElementSink):
     event = event + self._encodeValue(new_value,type)
     self._send(event)
   
-  def graphAttributeRemoved(self, attribute):
+  def graphAttributeRemoved(self, source_id, time_id, attribute):
     event = self._encodeByte(EVENT_DEL_GRAPH_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(attribute)
     self._send(event)
   
-  def nodeAttributeAdded(self, node_id, attribute, value):
+  def nodeAttributeAdded(self, source_id, time_id, node_id, attribute, value):
     event = self._encodeByte(EVENT_ADD_NODE_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(node_id)
     event = event + self._encodeString(attribute)
     type = self._getType(value)
@@ -190,8 +194,9 @@ class NetStreamSender(AttributeSink,ElementSink):
     event = event + self._encodeValue(value,type)
     self._send(event)
   
-  def nodeAttributeChanged(self, node_id, attribute, old_value, new_value):
+  def nodeAttributeChanged(self, source_id, time_id, node_id, attribute, old_value, new_value):
     event = self._encodeByte(EVENT_CHG_NODE_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(node_id)
     event = event + self._encodeString(attribute)
     type = self._getType(old_value)
@@ -200,14 +205,16 @@ class NetStreamSender(AttributeSink,ElementSink):
     event = event + self._encodeValue(new_value,type)
     self._send(event)
   
-  def nodeAttributeRemoved(self, node_id, attribute):
+  def nodeAttributeRemoved(self, source_id, time_id, node_id, attribute):
     event = self._encodeByte(EVENT_DEL_NODE_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(node_id)
     event = event + self._encodeString(attribute)
     self._send(event)
   
-  def edgeAttributeAdded(self, edge_id, attribute, value):
+  def edgeAttributeAdded(self, source_id, time_id, edge_id, attribute, value):
     event = self._encodeByte(EVENT_ADD_EDGE_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(edge_id)
     event = event + self._encodeString(attribute)
     type = self._getType(value)
@@ -215,8 +222,9 @@ class NetStreamSender(AttributeSink,ElementSink):
     event = event + self._encodeValue(value,type)
     self._send(event)
   
-  def edgeAttributeChanged(self, edge_id, attribute, old_value, new_value):
+  def edgeAttributeChanged(self, source_id, time_id, edge_id, attribute, old_value, new_value):
     event = self._encodeByte(EVENT_CHG_EDGE_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(edge_id)
     event = event + self._encodeString(attribute)
     type = self._getType(old_value)
@@ -225,90 +233,102 @@ class NetStreamSender(AttributeSink,ElementSink):
     event = event + self._encodeValue(new_value,type)
     self._send(event)
   
-  def edgeAttributeRemoved(self, edge_id, attribute):
+  def edgeAttributeRemoved(self, source_id, time_id, edge_id, attribute):
     event = self._encodeByte(EVENT_DEL_EDGE_ATTR)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(edge_id)
     event = event + self._encodeString(attribute)
     self._send(event)
   
-  def nodeAdded(self, node_id):
+  def nodeAdded(self, source_id, time_id, node_id):
     event = self._encodeByte(EVENT_ADD_NODE)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(node_id)
     self._send(event)
   
-  def nodeRemoved(self, node_id):
+  def nodeRemoved(self, source_id, time_id, node_id):
     event = self._encodeByte(EVENT_DEL_NODE)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(node_id)
     self._send(event)
   
-  def edgeAdded(self, edge_id, from_node, to_node, directed):
+  def edgeAdded(self, source_id, time_id, edge_id, from_node, to_node, directed):
     event = self._encodeByte(EVENT_ADD_EDGE)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(edge_id)
     event = event + self._encodeString(from_node)
     event = event + self._encodeString(to_node)
     event = event + self._encodeBoolean(directed)
     self._send(event)
   
-  def edgeRemoved(self, edge_id):
+  def edgeRemoved(self, source_id, time_id, edge_id):
     event = self._encodeByte(EVENT_DEL_EDGE)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeString(edge_id)
     self._send(event)
   
-  def graphCleared(self):
+  def graphCleared(self, source_id, time_id):
     event = self._encodeByte(EVENT_CLEARED)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     self._send(event)
   
-  def stepBegins(self, timestamp):
+  def stepBegins(self, source_id, time_id, timestamp):
     event = self._encodeByte(EVENT_STEP)
+    event = event + self._encodeString(source_id) + self._encodeLong(time_id)
     event = event + self._encodeDouble(timestamp)
     self._send(event)
-
 
 def example():
   """docstring for main"""
   
   stream = NetStreamSender("default","localhost",2001)
   
+  source_id="xxx"
+  time_id=0L
   ss = "node{fill-mode:plain;fill-color:#567;size:6px;}";
   
-  stream.graphAttributeAdded("stylesheet", ss);
-  stream.graphAttributeAdded("ui.antialias", True);
-  stream.graphAttributeAdded("layout.stabilization-limit", 0);
+  stream.graphAttributeAdded(source_id, time_id,"stylesheet", ss);time_id+=1;
+  stream.graphAttributeAdded(source_id, time_id,"ui.antialias", True);time_id+=1;
+  stream.graphAttributeAdded(source_id, time_id,"layout.stabilization-limit", 0);time_id+=1;
   for i in range(0,500):
-    stream.nodeAdded(str(i));
+    stream.nodeAdded(source_id, time_id,str(i));time_id+=1;
     if(i>0):
-      stream.edgeAdded(str(i)+"_"+str(i-1), str(i), str(i-1),False)
-      stream.edgeAdded(str(i)+"__"+str(i/2), str(i), str(i/2), False)
+      stream.edgeAdded(source_id, time_id,str(i)+"_"+str(i-1), str(i), str(i-1),False);time_id+=1;
+      stream.edgeAdded(source_id, time_id,str(i)+"__"+str(i/2), str(i), str(i/2), False);time_id+=1;
 
 def testEvents():
+  source_id="xxx"
+  time_id=0L
   stream = NetStreamSender("default","localhost",2001)
-  stream.nodeAdded("node0")
-  stream.edgeAdded("edge", "node0", "node1", True)  
-  stream.nodeAttributeAdded("node0","nodeAttribute", 0);
-  stream.nodeAttributeChanged("node0","nodeAttribute",0, 1);
-  stream.nodeAttributeRemoved("node0","nodeAttribute");
-  stream.edgeAttributeAdded("edge","edgeAttribute", 0);
-  stream.edgeAttributeChanged("edge","edgeAttribute",0, 1);
-  stream.edgeAttributeRemoved("edge","edgeAttribute");
-  stream.graphAttributeAdded("graphAttribute", 0);
-  stream.graphAttributeChanged("graphAttribute",0, 1);
-  stream.graphAttributeRemoved("graphAttribute");
-  stream.stepBegins(1.1);
-  stream.edgeRemoved("edge");
-  stream.nodeRemoved("node0");
-  stream.graphCleared();
+  stream.nodeAdded(source_id, time_id, "node0");time_id+=1;
+  stream.edgeAdded(source_id, time_id,"edge", "node0", "node1", True);time_id+=1;
+  stream.nodeAttributeAdded(source_id, time_id, "node0","nodeAttribute", 0);time_id+=1;
+  stream.nodeAttributeChanged(source_id, time_id, "node0","nodeAttribute",0, 1);time_id+=1;
+  stream.nodeAttributeRemoved(source_id, time_id, "node0","nodeAttribute");time_id+=1;
+  stream.edgeAttributeAdded(source_id, time_id, "edge","edgeAttribute", 0);time_id+=1;
+  stream.edgeAttributeChanged(source_id, time_id, "edge","edgeAttribute",0, 1);time_id+=1;
+  stream.edgeAttributeRemoved(source_id, time_id, "edge","edgeAttribute");time_id+=1;
+  stream.graphAttributeAdded(source_id, time_id, "graphAttribute", 0);time_id+=1;
+  stream.graphAttributeChanged(source_id, time_id, "graphAttribute",0, 1);time_id+=1;
+  stream.graphAttributeRemoved(source_id, time_id, "graphAttribute");time_id+=1;
+  stream.stepBegins(source_id, time_id, 1.1);time_id+=1;
+  stream.edgeRemoved(source_id, time_id, "edge");time_id+=1;
+  stream.nodeRemoved(source_id, time_id,"node0");time_id+=1;
+  stream.graphCleared(source_id, time_id);time_id+=1;
 
 def testTypes():
+  source_id="xxx"
+  time_id=0L
   nsc = NetStreamSender("default","localhost", 2001)
-  nsc.graphAttributeAdded("intArray", [0, 1, 2])
-  nsc.graphAttributeAdded("doubleArray", [0.0,1.1,2.2])
-  nsc.graphAttributeAdded("longArray", [0L,1L,2L])
-  nsc.graphAttributeAdded("booleanArray", [True, False])
-  nsc.graphAttributeAdded("int", 1)
-  nsc.graphAttributeAdded("double", 1.0)
-  nsc.graphAttributeAdded("long", 1L);
-  nsc.graphAttributeAdded("boolean", True)
-  nsc.graphAttributeAdded("string", "true")
+  nsc.graphAttributeAdded(source_id, time_id, "intArray", [0, 1, 2]);time_id+=1;
+  nsc.graphAttributeAdded(source_id, time_id, "doubleArray", [0.0,1.1,2.2]);time_id+=1;
+  nsc.graphAttributeAdded(source_id, time_id, "longArray", [0L,1L,2L]);time_id+=1;
+  nsc.graphAttributeAdded(source_id, time_id, "booleanArray", [True, False]);time_id+=1;
+  nsc.graphAttributeAdded(source_id, time_id, "int", 1);time_id+=1;
+  nsc.graphAttributeAdded(source_id, time_id, "double", 1.0);time_id+=1;
+  nsc.graphAttributeAdded(source_id, time_id, "long", 1L);time_id+=1;
+  nsc.graphAttributeAdded(source_id, time_id, "boolean", True);time_id+=1;
+  nsc.graphAttributeAdded(source_id, time_id, "string", "true");time_id+=1;
 
 if __name__ == "__main__":
-    testTypes()
+    example()

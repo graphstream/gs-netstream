@@ -15,56 +15,50 @@ import unittest
 
 
 class AttributeSink(object):
-  def graphAttributeAdded(self, attribute, value):
+  def graphAttributeAdded(self, source_id, time_id, attribute, value):
     raise NotImplementedError
   
-  def graphAttributeChanged(self, attribute, old_value, new_value):
+  def graphAttributeChanged(self, source_id, time_id, attribute, old_value, new_value):
     raise NotImplementedError
   
-  def graphAttributeRemoved(self, attribute):
+  def graphAttributeRemoved(self, source_id, time_id, attribute):
     raise NotImplementedError
   
-  def nodeAttributeAdded(self, node_id, attribute, value):
+  def nodeAttributeAdded(self, source_id, time_id, node_id, attribute, value):
     raise NotImplementedError
   
-  def nodeAttributeChanged(self, node_id, attribute, old_value, new_value):
+  def nodeAttributeChanged(self, source_id, time_id, node_id, attribute, old_value, new_value):
     raise NotImplementedError
   
-  def nodeAttributeRemoved(self, node_id, attribute):
+  def nodeAttributeRemoved(self, source_id, time_id, node_id, attribute):
     raise NotImplementedError
   
-  def edgeAttributeAdded(self, edge_id, attribute, value):
+  def edgeAttributeAdded(self, source_id, time_id, edge_id, attribute, value):
     raise NotImplementedError
   
-  def edgeAttributeChanged(self, edge_id, attribute, old_value, new_value):
+  def edgeAttributeChanged(self, source_id, time_id, edge_id, attribute, old_value, new_value):
     raise NotImplementedError
     
-  def edgeAttributeRemoved(self, edge_id, attribute):
+  def edgeAttributeRemoved(self, source_id, time_id, edge_id, attribute):
     raise NotImplementedError
 
 class ElementSink(object):
-  def nodeAdded(self, node_id):
+  def nodeAdded(self, source_id, time_id, node_id):
     raise NotImplementedError
   
-  def nodeRemoved(self, node_id):
+  def nodeRemoved(self, source_id, time_id, node_id):
     raise NotImplementedError
   
-  def edgeAdded(self, edge_id, from_node, to_node, directed):
+  def edgeAdded(self, source_id, time_id, edge_id, from_node, to_node, directed):
     raise NotImplementedError
   
-  def edgeRemoved(self, edge_id):
+  def edgeRemoved(self, source_id, time_id, edge_id):
     raise NotImplementedError
   
   def graphCleared(self):
     raise NotImplementedError
   
-  def stepBegins(self, timestamp):
+  def stepBegins(self, source_id, time_id, timestamp):
     raise NotImplementedError
+  
 
-class untitledTests(unittest.TestCase):
-  def setUp(self):
-    pass
-
-
-if __name__ == '__main__':
-  unittest.main()

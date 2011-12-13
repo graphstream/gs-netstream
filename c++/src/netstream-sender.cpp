@@ -206,42 +206,54 @@ void NetStreamSender::_sendEvent(Storage & event){
 // ==================
 // = Element events =
 // ================== 
-void NetStreamSender::addNode(const string & node_id){
+void NetStreamSender::addNode(const string & source_id, long time_id, const string & node_id){
   Storage event = Storage();
   event.writeByte(EVENT_ADD_NODE);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   event.writeString(node_id);
   _sendEvent(event);
 }
-void NetStreamSender::removeNode(const string & node_id){
+void NetStreamSender::removeNode(const string & source_id, long time_id, const string & node_id){
   Storage event = Storage();
   event.writeByte(EVENT_DEL_NODE);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   event.writeString(node_id);
   _sendEvent(event);
 }
-void NetStreamSender::addEdge(const string & edge_id, const string & from_node, const string & to_node, bool directed){
+void NetStreamSender::addEdge(const string & source_id, long time_id, const string & edge_id, const string & from_node, const string & to_node, bool directed){
   Storage event = Storage();
   event.writeByte(EVENT_ADD_EDGE);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   event.writeString(edge_id);
   event.writeString(from_node);
   event.writeString(to_node);
   event.writeByte(directed?1:0);
   _sendEvent(event);
 }
-void NetStreamSender::removeEdge(const string & edge_id){
+void NetStreamSender::removeEdge(const string & source_id, long time_id, const string & edge_id){
   Storage event = Storage();
   event.writeByte(EVENT_DEL_EDGE);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   event.writeString(edge_id);
   _sendEvent(event);
 }
-void NetStreamSender::stepBegins(double timestamp){
+void NetStreamSender::stepBegins(const string & source_id, long time_id, double timestamp){
   Storage event = Storage();
   event.writeByte(EVENT_STEP);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   event.writeDouble(timestamp);
   _sendEvent(event);
 }
-void NetStreamSender::graphClear(){
+void NetStreamSender::graphClear(const string & source_id, long time_id){
   Storage event = Storage();
   event.writeByte(EVENT_CLEARED);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   _sendEvent(event);  
 }
 
@@ -249,22 +261,28 @@ void NetStreamSender::graphClear(){
 // = Attributes events =
 // ===================== 
 
-void NetStreamSender::removeNodeAttribute(const string & node_id, const string & attribute){
+void NetStreamSender::removeNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute){
   Storage event = Storage();
   event.writeByte(EVENT_DEL_NODE_ATTR);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   event.writeString(node_id);
   event.writeString(attribute);
   _sendEvent(event);
 }
-void NetStreamSender::removeGraphAttribute(const string & attribute){
+void NetStreamSender::removeGraphAttribute(const string & source_id, long time_id, const string & attribute){
   Storage event = Storage();
   event.writeByte(EVENT_DEL_GRAPH_ATTR);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   event.writeString(attribute);
   _sendEvent(event);
 }
-void NetStreamSender::removeEdgeAttribute(const string & edge_id, const string & attribute){
+void NetStreamSender::removeEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute){
   Storage event = Storage();
   event.writeByte(EVENT_DEL_EDGE_ATTR);
+  event.writeString(source_id);
+  event.writeLong(time_id);
   event.writeString(edge_id);
   event.writeString(attribute);
   _sendEvent(event);
