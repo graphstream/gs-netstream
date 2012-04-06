@@ -8,7 +8,7 @@ The aim of this gs-netstream project is to propose a repository of implementatio
 
 .. _GraphStream: http://graphstream-project.org/
 
-Implementations of the NetStrem protocol can be from the sender (client) side so as from the receiver (server) side.  
+Implementations of the NetStream protocol can be from the sender (client) side so as from the receiver (server) side.  
 
 For now here are the implementations that are proposed:
 
