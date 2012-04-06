@@ -19,6 +19,6 @@ For now here are the implementations that are proposed:
 If you need to implement a sender or a receiver in another language,
 check the `manual`_ for a full description of the protocol
 
-.. _manual: https://github.com/pigne/gs-netstream/wiki/NetStream-Manual
+.. _manual: https://github.com/graphstream/gs-netstream/wiki/NetStream-Manual
 
 
