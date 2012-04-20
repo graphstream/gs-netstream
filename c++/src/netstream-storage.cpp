@@ -11,9 +11,8 @@
  **                                                                    **
  ************************************************************************/
 
-#include "storage.h"
+#include "netstream-storage.h"
 
-#ifdef BUILD_TCPIP
 
 #include <iostream>
 #include <iterator>
@@ -23,20 +22,19 @@
 
 using namespace std;
 
-//#define NULLITER static_cast<list<unsigned char>::iterator>(0)
 
-namespace tcpip
+namespace netstream
 {
 
 	// ----------------------------------------------------------------------
-	Storage::Storage()
+	NetStreamStorage::NetStreamStorage()
 	{
 		init();
 	}
 
 
 	// ----------------------------------------------------------------------
-	Storage::Storage(unsigned char packet[], int length)
+	NetStreamStorage::NetStreamStorage(unsigned char packet[], int length)
 	{
 		// Length is calculated, if -1, or given
 		if (length == -1) length = sizeof(packet) / sizeof(unsigned char);
@@ -50,7 +48,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::init()
+	void NetStreamStorage::init()
 	{
 		// Initialize local variables
 		iter_ = store.begin();
@@ -62,19 +60,19 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	Storage::~Storage()
+	NetStreamStorage::~NetStreamStorage()
 	{}
 
 
 	// ----------------------------------------------------------------------
-	bool Storage::valid_pos()
+	bool NetStreamStorage::valid_pos()
 	{
 		return (iter_ != store.end());   // this implies !store.empty()
 	}
 
 
 	// ----------------------------------------------------------------------
-	unsigned int Storage::position() const
+	unsigned int NetStreamStorage::position() const
 	{
 		// According to C++ standard std::distance will simply compute the iterators
 		// difference for random access iterators as std::vector provides.
@@ -83,7 +81,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::reset()
+	void NetStreamStorage::reset()
 	{
 		store.clear();
 		iter_ = store.begin();
@@ -95,11 +93,11 @@ namespace tcpip
 	* Reads a char form the array
 	* @return The read char (between 0 and 255)
 	*/
-	unsigned char Storage::readChar() throw(std::invalid_argument)
+	unsigned char NetStreamStorage::readChar() throw(std::invalid_argument)
 	{
 		if ( !valid_pos() )
 		{
-			throw std::invalid_argument("Storage::readChar(): invalid position");
+			throw std::invalid_argument("NetStreamStorage::readChar(): invalid position");
 		}
 		return readCharUnsafe();
 	}
@@ -109,7 +107,7 @@ namespace tcpip
 	/**
 	*
 	*/
-	void Storage::writeChar(unsigned char value) throw()
+	void NetStreamStorage::writeChar(unsigned char value) throw()
 	{
 		store.push_back(value);
 		iter_ = store.begin();
@@ -121,7 +119,7 @@ namespace tcpip
 	* Reads a byte form the array
 	* @return The read byte (between -128 and 127)
 	*/
-	int Storage::readByte()	throw(std::invalid_argument)
+	int NetStreamStorage::readByte()	throw(std::invalid_argument)
 	{
 		int i = static_cast<int>(readChar());
 		if (i < 128) return i;
@@ -133,11 +131,11 @@ namespace tcpip
 	/**
 	*
 	*/
-	void Storage::writeByte(int value) throw(std::invalid_argument)
+	void NetStreamStorage::writeByte(int value) throw(std::invalid_argument)
 	{
 		if (value < -128 || value > 127)
 		{
-			throw std::invalid_argument("Storage::writeByte(): Invalid value, not in [-128, 127]");
+			throw std::invalid_argument("NetStreamStorage::writeByte(): Invalid value, not in [-128, 127]");
 		}
 		writeChar( static_cast<unsigned char>( (value+256) % 256 ) );
 	}
@@ -148,7 +146,7 @@ namespace tcpip
 	* Reads an unsigned byte form the array
 	* @return The read byte (between 0 and 255)
 	*/
-	int Storage::readUnsignedByte()	throw(std::invalid_argument)
+	int NetStreamStorage::readUnsignedByte()	throw(std::invalid_argument)
 	{
 		return static_cast<int>(readChar());
 	}
@@ -158,11 +156,11 @@ namespace tcpip
 	/**
 	*
 	*/
-	void Storage::writeUnsignedByte(int value) throw(std::invalid_argument)
+	void NetStreamStorage::writeUnsignedByte(int value) throw(std::invalid_argument)
 	{
 		if (value < 0 || value > 255)
 		{
-			throw std::invalid_argument("Storage::writeUnsignedByte(): Invalid value, not in [0, 255]");
+			throw std::invalid_argument("NetStreamStorage::writeUnsignedByte(): Invalid value, not in [0, 255]");
 		}
 		writeChar( static_cast<unsigned char>( value ));
 	}
@@ -173,7 +171,7 @@ namespace tcpip
 	* Reads a string form the array
 	* @return The read string
 	*/
-	std::string Storage::readString() throw(std::invalid_argument)
+	std::string NetStreamStorage::readString() throw(std::invalid_argument)
 	{
 		int len = readInt();
 		checkReadSafe(len);
@@ -190,7 +188,7 @@ namespace tcpip
 	* Writes a string into the array;
 	* @param s		The string to be written
 	*/
-	void Storage::writeString(const std::string &s) throw()
+	void NetStreamStorage::writeString(const std::string &s) throw()
 	{
 		writeInt(static_cast<int>(s.length()));
 
@@ -204,7 +202,7 @@ namespace tcpip
 	* Reads a string list form the array
 	* @return The read string
 	*/
-	std::vector<std::string> Storage::readStringList() throw(std::invalid_argument)
+	std::vector<std::string> NetStreamStorage::readStringList() throw(std::invalid_argument)
 	{
 		std::vector<std::string> tmp;
 		const int len = readInt();
@@ -222,7 +220,7 @@ namespace tcpip
 	* Writes a string into the array;
 	* @param s		The string to be written
 	*/
-	void Storage::writeStringList(const std::vector<std::string> &s) throw()
+	void NetStreamStorage::writeStringList(const std::vector<std::string> &s) throw()
 	{
 		writeInt(static_cast<int>(s.size()));
         for (std::vector<std::string>::const_iterator it = s.begin(); it!=s.end() ; it++) 
@@ -240,7 +238,7 @@ namespace tcpip
 	*
 	* @return the unspoiled integer value (between -32768 and 32767)
 	*/
-	int Storage::readShort() throw(std::invalid_argument)
+	int NetStreamStorage::readShort() throw(std::invalid_argument)
 	{
 		short value = 0;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -250,11 +248,11 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::writeShort( int value ) throw(std::invalid_argument)
+	void NetStreamStorage::writeShort( int value ) throw(std::invalid_argument)
 	{
 		if (value < -32768 || value > 32767)
 		{
-			throw std::invalid_argument("Storage::writeShort(): Invalid value, not in [-32768, 32767]");
+			throw std::invalid_argument("NetStreamStorage::writeShort(): Invalid value, not in [-32768, 32767]");
 		}
 
 		short svalue = static_cast<short>(value);
@@ -271,7 +269,7 @@ namespace tcpip
 	*
 	* @return the unspoiled integer value (between -2.147.483.648 and 2.147.483.647)
 	*/
-	int Storage::readInt() throw(std::invalid_argument)
+	int NetStreamStorage::readInt() throw(std::invalid_argument)
 	{
 		int value = 0;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -281,7 +279,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::writeInt( int value ) throw()
+	void NetStreamStorage::writeInt( int value ) throw()
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
 		writeByEndianess(p_value, 4);
@@ -295,7 +293,7 @@ namespace tcpip
 	*
 	* @return the unspoiled integer value (between -??? and ???)
 	*/
-	long Storage::readLong() throw(std::invalid_argument)
+	long NetStreamStorage::readLong() throw(std::invalid_argument)
 	{
 		long value = 0L;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -305,7 +303,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::writeLong( long value ) throw()
+	void NetStreamStorage::writeLong( long value ) throw()
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
 		writeByEndianess(p_value, 8);
@@ -320,7 +318,7 @@ namespace tcpip
 	*
 	* @return the unspoiled float value
 	*/
-	float Storage::readFloat() throw(std::invalid_argument)
+	float NetStreamStorage::readFloat() throw(std::invalid_argument)
 	{
 		float value = 0;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -330,7 +328,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::writeFloat( float value ) throw()
+	void NetStreamStorage::writeFloat( float value ) throw()
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
 		writeByEndianess(p_value, 4);
@@ -338,7 +336,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::writeDouble( double value ) throw ()
+	void NetStreamStorage::writeDouble( double value ) throw ()
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
 		writeByEndianess(p_value, 8);
@@ -346,7 +344,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	double Storage::readDouble( ) throw (std::invalid_argument)
+	double NetStreamStorage::readDouble( ) throw (std::invalid_argument)
 	{
 		double value = 0;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -356,7 +354,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::writePacket(unsigned char* packet, int length)
+	void NetStreamStorage::writePacket(unsigned char* packet, int length)
 	{
 		store.insert(store.end(), &(packet[0]), &(packet[length]));
 		iter_ = store.begin();   // reserve() invalidates iterators
@@ -364,7 +362,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::writeStorage(tcpip::Storage& other)
+	void NetStreamStorage::writeStorage(NetStreamStorage& other)
 	{
 		// the compiler cannot deduce to use a const_iterator as source
 		store.insert<StorageType::const_iterator>(store.end(), other.iter_, other.store.end());
@@ -373,12 +371,12 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::checkReadSafe(unsigned int num) const  throw(std::invalid_argument)
+	void NetStreamStorage::checkReadSafe(unsigned int num) const  throw(std::invalid_argument)
 	{
 		if (std::distance(iter_, store.end()) < static_cast<int>(num))
 		{
 			std::ostringstream msg;
-			msg << "tcpip::Storage::readIsSafe: want to read "  << num << " bytes from Storage, "
+			msg << "netstream::Storage::readIsSafe: want to read "  << num << " bytes from Storage, "
 				<< "but only " << std::distance(iter_, store.end()) << " remaining";
 			throw std::invalid_argument(msg.str());
 		}
@@ -386,7 +384,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	unsigned char Storage::readCharUnsafe()
+	unsigned char NetStreamStorage::readCharUnsafe()
 	{
 		char hb = *iter_;
 		++iter_;
@@ -395,7 +393,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::writeByEndianess(const unsigned char * begin, unsigned int size)
+	void NetStreamStorage::writeByEndianess(const unsigned char * begin, unsigned int size)
 	{
 		const unsigned char * end = &(begin[size]);
 		if (bigEndian_)
@@ -407,7 +405,7 @@ namespace tcpip
 
 
 	// ----------------------------------------------------------------------
-	void Storage::readByEndianess(unsigned char * array, int size)
+	void NetStreamStorage::readByEndianess(unsigned char * array, int size)
 	{
 		checkReadSafe(size);
 		if (bigEndian_)
@@ -423,9 +421,9 @@ namespace tcpip
 	}
 
   // -----------------------------------------------------------------------
-  Storage Storage::operator+(const Storage &storage)
+  NetStreamStorage NetStreamStorage::operator+(const NetStreamStorage &storage)
   {
-    Storage msg;
+    NetStreamStorage msg;
     msg.store.insert(msg.store.end(), store.begin(), store.end());
     msg.store.insert(msg.store.end(), storage.begin(), storage.end());
     return msg;
@@ -433,11 +431,11 @@ namespace tcpip
 
   // ------------------------------------------------------------------------
   
-   ostream &operator<<( ostream &out, const  Storage & s)
+   ostream &operator<<( ostream &out, const  NetStreamStorage & s)
   {
     out<<"[";
     
-    for(Storage::StorageType::const_iterator i = s.store.begin(); i != s.store.end(); i++){
+    for(NetStreamStorage::StorageType::const_iterator i = s.store.begin(); i != s.store.end(); i++){
       out<<(int)(*i)<<" ";
     }
     return out<<"]"<<endl;
@@ -446,9 +444,6 @@ namespace tcpip
 
 
 }
-
-  
-#endif // BUILD_TCPIP
 
 /*-----------------------------------------------------------------------
  * Source  $Source: $

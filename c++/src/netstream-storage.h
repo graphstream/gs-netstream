@@ -10,32 +10,20 @@
  ** \author Bjoern Hendriks <hendriks@ibr.cs.tu-bs.de>                 **
  **                                                                    **
  ************************************************************************/
-#ifndef __SHAWN_APPS_TCPIP_STORAGE_H
-#define __SHAWN_APPS_TCPIP_STORAGE_H
+#ifndef __NETSTREAM_STORAGE_H
+#define __NETSTREAM_STORAGE_H
 
-#ifdef SHAWN
-     #include <shawn_config.h>
-     #include "_apps_enable_cmake.h"
-     #ifdef ENABLE_TCPIP
-            #define BUILD_TCPIP
-     #endif
-#else
-     #define BUILD_TCPIP
-#endif
-
-
-#ifdef BUILD_TCPIP
 
 #include <vector>
 #include <string>
 #include <stdexcept>
 
-namespace tcpip
+namespace netstream
 {
 
-class Storage
+class NetStreamStorage
 {
-  friend std::ostream& operator<<(std::ostream &, const Storage &);
+  friend std::ostream& operator<<(std::ostream &, const NetStreamStorage &);
   
 
 public:
@@ -65,13 +53,13 @@ private:
 public:
 
 	/// Standard Constructor
-	Storage();
+	NetStreamStorage();
 
 	/// Constructor, that fills the storage with an char array. If length is -1, the whole array is handed over
-	Storage(unsigned char[], int length=-1);
+	NetStreamStorage(unsigned char[], int length=-1);
 
 	// Destructor
-	virtual ~Storage();
+	virtual ~NetStreamStorage();
 
 	virtual bool valid_pos();
 	virtual unsigned int position() const;
@@ -111,9 +99,9 @@ public:
 
 	virtual void writePacket(unsigned char* packet, int length);
 
-	virtual void writeStorage(tcpip::Storage& store);
+	virtual void writeStorage(netstream::NetStreamStorage& store);
 
-  virtual Storage operator+(const Storage & storage);
+  virtual NetStreamStorage operator+(const NetStreamStorage & storage);
 
   
 	// Some enabled functions of the underlying std::list
@@ -126,9 +114,9 @@ public:
 
 } // namespace tcpip
 
-#endif // BUILD_TCPIP
+#endif // NETSTREAM_STORAGE
 
-#endif
+
 /*-----------------------------------------------------------------------
  * Source  $Source: $
  * Version $Revision: 426 $

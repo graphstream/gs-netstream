@@ -18,21 +18,23 @@
 #include <sys/socket.h>
 #include <errno.h>
 
-#include "tcpip/storage.h"
-#include "tcpip/socket.h"
+#include "netstream-storage.h"
+#include "netstream-socket.h"
 #include "netstream-constants.h"
 
 using namespace std;
-using namespace tcpip;
 
+
+namespace netstream{
+  
 class NetStreamSender{
 
 protected:
   string _stream_name;
   string _host;
   int _port;
-  Socket _socket;
-  Storage _stream;
+  NetStreamSocket _socket;
+  NetStreamStorage _stream;
   bool debug;
 
   void init();
@@ -63,30 +65,30 @@ protected:
   int _getType( const vector<double> & object);
 
   template <typename T>
-  void encode(Storage & event, const T & value){
+  void encode(NetStreamStorage & event, const T & value){
     _encode(event, value);
   }
   template <typename T>
-  void encode(Storage & event, const vector<T> & value){
+  void encode(NetStreamStorage & event, const vector<T> & value){
     _encode(event, value);
   }
-  void _encode(Storage & event, char value);
-  void _encode(Storage & event, bool value);
-  void _encode(Storage & event, int value);
-  void _encode(Storage & event, long value);
-  void _encode(Storage & event, float value);
-  void _encode(Storage & event, double value);
-  void _encode(Storage & event, const string & value);
+  void _encode(NetStreamStorage & event, char value);
+  void _encode(NetStreamStorage & event, bool value);
+  void _encode(NetStreamStorage & event, int value);
+  void _encode(NetStreamStorage & event, long value);
+  void _encode(NetStreamStorage & event, float value);
+  void _encode(NetStreamStorage & event, double value);
+  void _encode(NetStreamStorage & event, const string & value);
   
-  void _encode(Storage & event, const vector<char> & value);
-  void _encode(Storage & event, const vector<bool> & value);
-  void _encode(Storage & event, const vector<int> & value);
-  void _encode(Storage & event, const vector <long> & value);
-  void _encode(Storage & event, const vector <float> & value);
-  void _encode(Storage & event, const vector <double> & value);
+  void _encode(NetStreamStorage & event, const vector<char> & value);
+  void _encode(NetStreamStorage & event, const vector<bool> & value);
+  void _encode(NetStreamStorage & event, const vector<int> & value);
+  void _encode(NetStreamStorage & event, const vector <long> & value);
+  void _encode(NetStreamStorage & event, const vector <float> & value);
+  void _encode(NetStreamStorage & event, const vector <double> & value);
   
   
-  void _sendEvent(Storage &);
+  void _sendEvent(NetStreamStorage &);
   
 public:
 
@@ -112,8 +114,8 @@ public:
   // ====================
   template <typename T>
   void addGraphAttribute(const string & source_id, long time_id, const string & attribute,  T value){
-    Storage event = Storage();
-    event.writeByte(EVENT_ADD_GRAPH_ATTR);
+    NetStreamStorage event = NetStreamStorage();
+    event.writeByte(netstream::EVENT_ADD_GRAPH_ATTR);
     event.writeString(source_id);
     event.writeLong(time_id);
     event.writeString(attribute);
@@ -124,7 +126,7 @@ public:
 
   template <typename T>
   void changeGraphAttribute(const string & source_id, long time_id, const string & attribute, const T oldValue, const T newValue){
-     Storage event = Storage();
+     NetStreamStorage event = NetStreamStorage();
      event.writeByte(EVENT_CHG_GRAPH_ATTR);
      event.writeString(source_id);
      event.writeLong(time_id);
@@ -139,7 +141,7 @@ public:
   
   template <typename T>
   void addNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute, const T & value){
-    Storage event = Storage();
+    NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_ADD_NODE_ATTR);
     event.writeString(source_id);
     event.writeLong(time_id);
@@ -152,7 +154,7 @@ public:
 
   template <typename T>
   void changeNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute, const T & oldValue, const T & newValue){
-    Storage event = Storage();
+    NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_CHG_NODE_ATTR);
     event.writeString(source_id);
     event.writeLong(time_id);
@@ -168,7 +170,7 @@ public:
   
   template <typename T>
   void addEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute, const T & value){
-    Storage event = Storage();
+    NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_ADD_EDGE_ATTR);
     event.writeString(source_id);
     event.writeLong(time_id);
@@ -182,7 +184,7 @@ public:
 
   template <typename T>
   void changeEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute, const T & oldValue, const T & newValue){
-    Storage event = Storage();
+    NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_CHG_EDGE_ATTR);
     event.writeString(source_id);
     event.writeLong(time_id);
@@ -197,4 +199,6 @@ public:
   void removeEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute);
   
 };
+
+}
 #endif

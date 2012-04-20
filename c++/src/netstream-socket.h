@@ -6,27 +6,15 @@
  ** file in the root of the Shawn source tree for further details.     **
  ************************************************************************/
 
-#ifndef __SHAWN_APPS_TCPIP_SOCKET_H
-#define __SHAWN_APPS_TCPIP_SOCKET_H
+#ifndef __NETSTREAM_SOCKET_H
+#define __NETSTREAM_SOCKET_H
 
-#ifdef SHAWN
-     #include <shawn_config.h>
-     #include "_apps_enable_cmake.h"
-     #ifdef ENABLE_TCPIP
-            #define BUILD_TCPIP
-     #endif
-#else
-     #define BUILD_TCPIP
-#endif
-
-
-#ifdef BUILD_TCPIP
 
 // Get Storage
 #ifdef SHAWN
 	#include <apps/tcpip/storage.h>
 #else
-	#include "storage.h"
+	#include "netstream-storage.h"
 #endif
 
 #ifdef SHAWN
@@ -52,18 +40,18 @@
 
 struct in_addr;
 
-namespace tcpip
+namespace netstream
 {
 
-	class SocketException: public std::exception
+	class NetStreamSocketException: public std::exception
 	{
 	private:
 		std::string what_;
 	public:
-		SocketException( std::string what ) throw() 
+		NetStreamSocketException( std::string what ) throw() 
 		{
 			what_ = what;
-			//std::cerr << "tcpip::SocketException: " << what << std::endl << std::flush;
+			//std::cerr << "netstream::NetStreamSocketException: " << what << std::endl << std::flush;
 		}
 
 		virtual const char* what() const throw()
@@ -71,34 +59,34 @@ namespace tcpip
 			return what_.c_str();
 		}
 
-		~SocketException() throw() {}
+		~NetStreamSocketException() throw() {}
 	};
 
-	class Socket
+	class NetStreamSocket
 	{
 		friend class Response;
 	public:
 		/// Constructor that prepare to connect to host:port 
-		Socket(std::string host, int port);
+		NetStreamSocket(std::string host, int port);
 		
 		/// Constructor that prepare for accepting a connection on given port
-		Socket(int port);
+		NetStreamSocket(int port);
 
 		/// Destructor
-		~Socket();
+		~NetStreamSocket();
 
 		/// Connects to host_:port_
-		void connect() throw( SocketException );
+		void connect() throw( NetStreamSocketException );
 
 		/// Wait for a incoming connection to port_
-		void accept() throw( SocketException );
-		void send( const std::vector<unsigned char> ) throw( SocketException );
-		void sendExact( const Storage & ) throw( SocketException );
-		std::vector<unsigned char> receive( int bufSize = 2048 ) throw( SocketException );
-		bool receiveExact( Storage &) throw( SocketException );
+		void accept() throw( NetStreamSocketException );
+		void send( const std::vector<unsigned char> ) throw( NetStreamSocketException );
+		void sendExact( const NetStreamStorage & ) throw( NetStreamSocketException );
+		std::vector<unsigned char> receive( int bufSize = 2048 ) throw( NetStreamSocketException );
+		bool receiveExact( NetStreamStorage &) throw( NetStreamSocketException );
 		void close();
 		int port();
-		void set_blocking(bool) throw( SocketException );
+		void set_blocking(bool) throw( NetStreamSocketException );
 		bool is_blocking() throw();
 		bool has_client_connection() const;
 
@@ -108,7 +96,7 @@ namespace tcpip
 
 	private:
 		void init();
-		void BailOnSocketError( std::string ) const throw( SocketException );
+		void BailOnNetStreamSocketError( std::string ) const throw( NetStreamSocketException );
 #ifdef WIN32
 		std::string GetWinsockErrorString(int err) const;
 #endif
@@ -133,7 +121,6 @@ namespace tcpip
 
 #endif // BUILD_TCPIP
 
-#endif
 
 /*-----------------------------------------------------------------------
 * Source  $Source: $

@@ -7,30 +7,34 @@ CC = g++
 CWARN = -W -Wall -Wshadow -Wimplicit -Wreturn-type -Wcomment -Wtrigraphs -Wformat -Wparentheses -Wpointer-arith -Wuninitialized -O
 
 CDBG = -g $(CWARN) -fno-inline
-CFLAGS = -I$(INCDIR) -03  
+CFLAGS = -I$(INCDIR) -03 
 DFLAGS = -I$(INCDIR) -g $(CWARN) -fno-inline -DDEBUG=1
 
 CTAG = ctags
 CTAGFILE = filelist
 # src, object and bin files
-MAIN := netstream-main 
+OUT_BINARY := netstream-main 
+OUT_LIBRARY := libnetstream.a
 
 HEADERS = $(INCDIR)/global.h
 
 OBJS = \
-    $(OBJDIR)/tcpip/storage.o  \
-	$(OBJDIR)/tcpip/socket.o \
+    $(OBJDIR)/netstream-storage.o  \
+	$(OBJDIR)/netstream-socket.o \
     $(OBJDIR)/netstream-sender.o \
 	$(OBJDIR)/netstream-main.o 
 	 
 .SECONDARY:
 
 #-- Rules
-all : $(MAIN)
+all : $(OUT_BINARY) $(OUT_LIBRARY)
 
-$(MAIN) : $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS)  -o $(MAIN)
-	
+$(OUT_BINARY) : $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(OUT_BINARY)
+
+$(OUT_LIBRARY) : $(OBJS)
+	libtool -o $(OUT_LIBRARY)  $(OBJS)
+
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CC) $(CFLAGS) -c $? -o $@ 
 
@@ -46,6 +50,7 @@ clean :
 	-rm -f $(SRCDIR)/*.output $(LEX_C)
 	-rm -f */*~ *~ core
 	-rm -f $(BINDIR)/*
-	-rm -f $(MAIN)
+	-rm -f $(OUT_BINARY)
+	-rm -f $(OUT_LIBRARY)
 
 fresh : clean all

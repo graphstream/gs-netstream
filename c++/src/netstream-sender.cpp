@@ -13,7 +13,8 @@
 
 #include "netstream-sender.h"
 
-
+namespace netstream{
+  
 NetStreamSender::NetStreamSender(const string & host, int port):
 _stream_name("default"),_host(host),_port(port),_stream(),_socket(host,port),debug(false)  {
   init();
@@ -123,58 +124,58 @@ return TYPE_DOUBLE_ARRAY;}
 // =================
 // = data encoding =
 // =================
-void NetStreamSender::_encode(Storage & event, char value){
+void NetStreamSender::_encode(NetStreamStorage & event, char value){
   event.writeByte((int)value);
 }
-void NetStreamSender::_encode(Storage & event, bool value){
+void NetStreamSender::_encode(NetStreamStorage & event, bool value){
   event.writeByte(value?1:0);
 }
-void NetStreamSender::_encode(Storage & event, int value){
+void NetStreamSender::_encode(NetStreamStorage & event, int value){
   event.writeInt(value);
 }
-void NetStreamSender::_encode(Storage & event, long value){
+void NetStreamSender::_encode(NetStreamStorage & event, long value){
   event.writeLong(value);
 }
-void NetStreamSender::_encode(Storage & event, float value){
+void NetStreamSender::_encode(NetStreamStorage & event, float value){
   event.writeFloat(value);
 }
-void NetStreamSender::_encode(Storage & event, double value){
+void NetStreamSender::_encode(NetStreamStorage & event, double value){
   event.writeDouble(value);
 }
-void NetStreamSender::_encode(Storage & event,const  string & value){
+void NetStreamSender::_encode(NetStreamStorage & event,const  string & value){
   event.writeString(value);
 }
-void NetStreamSender::_encode(Storage & event, const vector<char> & value){
+void NetStreamSender::_encode(NetStreamStorage & event, const vector<char> & value){
   event.writeInt(value.size());
   for(vector<char>::const_iterator i = value.begin(); i != value.end(); i++){
     event.writeByte((*i));
   }
 }
-void NetStreamSender::_encode(Storage & event, const vector<bool> & value){
+void NetStreamSender::_encode(NetStreamStorage & event, const vector<bool> & value){
   event.writeInt(value.size());
   for(vector<bool>::const_iterator i = value.begin(); i != value.end(); i++){
     event.writeByte((*i));
   }
 }
-void NetStreamSender::_encode(Storage & event, const vector<int> & value){
+void NetStreamSender::_encode(NetStreamStorage & event, const vector<int> & value){
   event.writeInt(value.size());
   for(vector<int>::const_iterator i = value.begin(); i != value.end(); i++){
     event.writeInt((*i));
   }
 }
-void NetStreamSender::_encode(Storage & event, const vector<long> & value){
+void NetStreamSender::_encode(NetStreamStorage & event, const vector<long> & value){
   event.writeInt(value.size());
   for(vector<long>::const_iterator i = value.begin(); i != value.end(); i++){
     event.writeLong((*i));
   }  
 }
-void NetStreamSender::_encode(Storage & event, const vector<float> & value){
+void NetStreamSender::_encode(NetStreamStorage & event, const vector<float> & value){
   event.writeInt(value.size());
   for(vector<float>::const_iterator i = value.begin(); i != value.end(); i++){
     event.writeFloat((*i));
   }
 }
-void NetStreamSender::_encode(Storage & event, const vector<double> &  value){
+void NetStreamSender::_encode(NetStreamStorage & event, const vector<double> &  value){
   event.writeInt(value.size());
   for(vector<double>::const_iterator i = value.begin(); i != value.end(); i++){
     event.writeDouble((*i));
@@ -182,12 +183,12 @@ void NetStreamSender::_encode(Storage & event, const vector<double> &  value){
 }
 
 
-void NetStreamSender::_sendEvent(Storage & event){
+void NetStreamSender::_sendEvent(NetStreamStorage & event){
   
   if(debug){
     cout<<event<<endl;
     /*
-    for(Storage::StorageType::const_iterator it = event.begin(); it != event.end();){
+    for(NetStreamStorage::NetStreamStorageType::const_iterator it = event.begin(); it != event.end();){
       cout<<(int)(*it)<<",";
       it++;
     }
@@ -197,7 +198,7 @@ void NetStreamSender::_sendEvent(Storage & event){
   try{
     _socket.sendExact(_stream+event);
   }
-  catch (SocketException &e)
+  catch (NetStreamSocketException &e)
   {
     cout << "Error while sending message: " << e.what();
   }
@@ -207,7 +208,7 @@ void NetStreamSender::_sendEvent(Storage & event){
 // = Element events =
 // ================== 
 void NetStreamSender::addNode(const string & source_id, long time_id, const string & node_id){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_ADD_NODE);
   event.writeString(source_id);
   event.writeLong(time_id);
@@ -215,7 +216,7 @@ void NetStreamSender::addNode(const string & source_id, long time_id, const stri
   _sendEvent(event);
 }
 void NetStreamSender::removeNode(const string & source_id, long time_id, const string & node_id){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_DEL_NODE);
   event.writeString(source_id);
   event.writeLong(time_id);
@@ -223,7 +224,7 @@ void NetStreamSender::removeNode(const string & source_id, long time_id, const s
   _sendEvent(event);
 }
 void NetStreamSender::addEdge(const string & source_id, long time_id, const string & edge_id, const string & from_node, const string & to_node, bool directed){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_ADD_EDGE);
   event.writeString(source_id);
   event.writeLong(time_id);
@@ -234,7 +235,7 @@ void NetStreamSender::addEdge(const string & source_id, long time_id, const stri
   _sendEvent(event);
 }
 void NetStreamSender::removeEdge(const string & source_id, long time_id, const string & edge_id){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_DEL_EDGE);
   event.writeString(source_id);
   event.writeLong(time_id);
@@ -242,7 +243,7 @@ void NetStreamSender::removeEdge(const string & source_id, long time_id, const s
   _sendEvent(event);
 }
 void NetStreamSender::stepBegins(const string & source_id, long time_id, double timestamp){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_STEP);
   event.writeString(source_id);
   event.writeLong(time_id);
@@ -250,7 +251,7 @@ void NetStreamSender::stepBegins(const string & source_id, long time_id, double 
   _sendEvent(event);
 }
 void NetStreamSender::graphClear(const string & source_id, long time_id){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_CLEARED);
   event.writeString(source_id);
   event.writeLong(time_id);
@@ -262,7 +263,7 @@ void NetStreamSender::graphClear(const string & source_id, long time_id){
 // ===================== 
 
 void NetStreamSender::removeNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_DEL_NODE_ATTR);
   event.writeString(source_id);
   event.writeLong(time_id);
@@ -271,7 +272,7 @@ void NetStreamSender::removeNodeAttribute(const string & source_id, long time_id
   _sendEvent(event);
 }
 void NetStreamSender::removeGraphAttribute(const string & source_id, long time_id, const string & attribute){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_DEL_GRAPH_ATTR);
   event.writeString(source_id);
   event.writeLong(time_id);
@@ -279,11 +280,12 @@ void NetStreamSender::removeGraphAttribute(const string & source_id, long time_i
   _sendEvent(event);
 }
 void NetStreamSender::removeEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute){
-  Storage event = Storage();
+  NetStreamStorage event = NetStreamStorage();
   event.writeByte(EVENT_DEL_EDGE_ATTR);
   event.writeString(source_id);
   event.writeLong(time_id);
   event.writeString(edge_id);
   event.writeString(attribute);
   _sendEvent(event);
+}
 }

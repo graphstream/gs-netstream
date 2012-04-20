@@ -10,10 +10,9 @@
 	#include <apps/tcpip/socket.h>
 	#include <sys/simulation/simulation_controller.h>
 #else
-	#include "socket.h"
+	#include "netstream-socket.h"
 #endif
 
-#ifdef BUILD_TCPIP
 
 
 #ifndef WIN32
@@ -57,17 +56,17 @@ using namespace std;
     }
 #endif
 
-namespace tcpip
+namespace netstream
 {
 #ifdef WIN32
-	bool Socket::init_windows_sockets_ = true;
-	bool Socket::windows_sockets_initialized_ = false;
-	int Socket::instance_count_ = 0;
+	bool NetStreamSocket::init_windows_sockets_ = true;
+	bool NetStreamSocket::windows_sockets_initialized_ = false;
+	int NetStreamSocket::instance_count_ = 0;
 #endif
 
 	// ----------------------------------------------------------------------
-	Socket::
-		Socket(std::string host, int port) 
+	NetStreamSocket::
+		NetStreamSocket(std::string host, int port) 
 		: host_( host ),
 		port_( port ),
 		socket_(-1),
@@ -79,8 +78,8 @@ namespace tcpip
 	}
 
 	// ----------------------------------------------------------------------
-	Socket::
-		Socket(int port) 
+	NetStreamSocket::
+		NetStreamSocket(int port) 
 		: host_(""),
 		port_( port ),
 		socket_(-1),
@@ -93,7 +92,7 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	void
-		Socket::
+		NetStreamSocket::
 		init()
 	{
 #ifdef WIN32
@@ -103,15 +102,15 @@ namespace tcpip
 		{
 			WSAData wsaData;
 			if( WSAStartup(MAKEWORD(1, 1), &wsaData) != 0 )
-				BailOnSocketError("Unable to init WSA Sockets");
+				BailOnNetStreamSocketError("Unable to init WSA NetStreamSockets");
 			windows_sockets_initialized_ = true;
 		}
 #endif
 	}
 
 	// ----------------------------------------------------------------------
-	Socket::
-		~Socket()
+	NetStreamSocket::
+		~NetStreamSocket()
 	{
 		// Close first an existing client connection ...
 		close();
@@ -140,9 +139,9 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	void 
-		Socket::
-		BailOnSocketError( std::string context) 
-		const throw( SocketException )
+		NetStreamSocket::
+		BailOnNetStreamSocketError( std::string context) 
+		const throw( NetStreamSocketException )
 	{
 #ifdef WIN32
 		int e = WSAGetLastError();
@@ -150,12 +149,12 @@ namespace tcpip
 #else
 		std::string msg = strerror( errno );
 #endif
-		throw SocketException( context + ": " + msg );
+		throw NetStreamSocketException( context + ": " + msg );
 	}
 
 	// ----------------------------------------------------------------------
 	int  
-		Socket::
+		NetStreamSocket::
 		port()
 	{
 		return port_;
@@ -164,7 +163,7 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	bool 
-		Socket::
+		NetStreamSocket::
 		datawaiting(int sock) 
 		const throw()
 	{
@@ -179,7 +178,7 @@ namespace tcpip
 		int r = select( sock+1, &fds, NULL, NULL, &tv);
 
 		if (r < 0)
-			BailOnSocketError("tcpip::Socket::datawaiting @ select");
+			BailOnNetStreamSocketError("netstream::NetStreamSocket::datawaiting @ select");
 
 		if( FD_ISSET( sock, &fds ) )
 			return true;
@@ -189,7 +188,7 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	bool
-		Socket::
+		NetStreamSocket::
 		atoaddr( std::string address, struct in_addr& addr)
 	{
 		struct hostent* host;
@@ -215,9 +214,9 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	void 
-		Socket::
+		NetStreamSocket::
 		accept()
-		throw( SocketException )
+		throw( NetStreamSocketException )
 	{
 		if( socket_ >= 0 )
 			return;
@@ -236,7 +235,7 @@ namespace tcpip
 			//Create the server socket
 			server_socket_ = static_cast<int>(socket( AF_INET, SOCK_STREAM, 0 ));
 			if( server_socket_ < 0 )
-				BailOnSocketError("tcpip::Socket::accept() @ socket");
+				BailOnNetStreamSocketError("netstream::NetStreamSocket::accept() @ socket");
 			
 			//"Address already in use" error protection
 			{
@@ -258,12 +257,12 @@ namespace tcpip
 
 			// Assign a port number to the socket
 			if ( bind(server_socket_, (struct sockaddr*)&self, sizeof(self)) != 0 )
-				BailOnSocketError("tcpip::Socket::accept() Unable to create listening socket");
+				BailOnNetStreamSocketError("netstream::NetStreamSocket::accept() Unable to create listening socket");
 
 
 			// Make it a "listening socket"
 			if ( listen(server_socket_, 10) == -1 )
-				BailOnSocketError("tcpip::Socket::accept() Unable to listen on server socket");
+				BailOnNetStreamSocketError("netstream::NetStreamSocket::accept() Unable to listen on server socket");
 
 			// Make the newly created socket blocking or not
 			set_blocking(blocking_);
@@ -280,9 +279,9 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	void 
-		Socket::
+		NetStreamSocket::
 		set_blocking(bool blocking) 
-		throw(SocketException )
+		throw(NetStreamSocketException )
 	{
 		blocking_ = blocking;
 
@@ -291,7 +290,7 @@ namespace tcpip
 #ifdef WIN32
 			ULONG NonBlock = blocking_ ? 0 : 1;
 		    if (ioctlsocket(server_socket_, FIONBIO, &NonBlock) == SOCKET_ERROR)
-				BailOnSocketError("tcpip::Socket::set_blocking() Unable to initialize non blocking I/O");
+				BailOnNetStreamSocketError("netstream::NetStreamSocket::set_blocking() Unable to initialize non blocking I/O");
 #else
 			long arg = fcntl(server_socket_, F_GETFL, NULL);
 			if (blocking_)
@@ -308,13 +307,13 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	void 
-		Socket::
+		NetStreamSocket::
 		connect()
-		throw( SocketException )
+		throw( NetStreamSocketException )
 	{
 		in_addr addr;
 		if( !atoaddr( host_.c_str(), addr) )
-			BailOnSocketError("tcpip::Socket::connect() @ Invalid network address");
+			BailOnNetStreamSocketError("netstream::NetStreamSocket::connect() @ Invalid network address");
 
 		sockaddr_in address;
 		memset( (char*)&address, 0, sizeof(address) );
@@ -324,10 +323,10 @@ namespace tcpip
 
 		socket_ = static_cast<int>(socket( PF_INET, SOCK_STREAM, 0 ));
 		if( socket_ < 0 )
-			BailOnSocketError("tcpip::Socket::connect() @ socket");
+			BailOnNetStreamSocketError("netstream::NetStreamSocket::connect() @ socket");
 
 		if( ::connect( socket_, (sockaddr const*)&address, sizeof(address) ) < 0 )
-			BailOnSocketError("tcpip::Socket::connect() @ connect");
+			BailOnNetStreamSocketError("netstream::NetStreamSocket::connect() @ connect");
 
 		if( socket_ >= 0 )
 		{
@@ -339,7 +338,7 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	void 
-		Socket::
+		NetStreamSocket::
 		close()
 	{
 		// Close client-connection 
@@ -357,9 +356,9 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	void 
-		Socket::
+		NetStreamSocket::
 		send( std::vector<unsigned char> b) 
-		throw( SocketException )
+		throw( NetStreamSocketException )
 	{
 		if( socket_ < 0 ) return;
 
@@ -373,7 +372,7 @@ namespace tcpip
 
 		if (verbose_) 
 		{
-			cerr << "Send " << numbytes << " bytes via tcpip::Socket: [";
+			cerr << "Send " << numbytes << " bytes via netstream::NetStreamSocket: [";
 			for(size_t i = 0; i < numbytes; ++i)
 			{
 				buf[i] = b[i];
@@ -392,9 +391,9 @@ namespace tcpip
 #endif
 			if( n<0 )
 			{
-				// BailOnSocketError definitely throws an exception so clear up heap
+				// BailOnNetStreamSocketError definitely throws an exception so clear up heap
 				delete[] buf;
-				BailOnSocketError( "send failed" );
+				BailOnNetStreamSocketError( "send failed" );
 			}
 
 			numbytes -= n;
@@ -409,12 +408,12 @@ namespace tcpip
         // ----------------------------------------------------------------------
 
 	void
-		Socket::
-		sendExact( const Storage &b)
-		throw( SocketException )
+		NetStreamSocket::
+		sendExact( const NetStreamStorage &b)
+		throw( NetStreamSocketException )
 	{
 		int length = static_cast<int>(b.size());
-		Storage length_storage;
+		NetStreamStorage length_storage;
 		length_storage.writeInt(length);
 		vector<unsigned char> msg;
 		msg.insert(msg.end(), length_storage.begin(), length_storage.end());
@@ -426,9 +425,9 @@ namespace tcpip
 	
 	// ----------------------------------------------------------------------
 	vector<unsigned char> 
-		Socket::
+		NetStreamSocket::
 		receive(int bufSize)
-		throw( SocketException )
+		throw( NetStreamSocketException )
 	{
 		vector<unsigned char> b;
 
@@ -443,9 +442,9 @@ namespace tcpip
 
 		if( a <= 0 )
 		{
-			// BailOnSocketError definitely throws an exception so clear up heap
+			// BailOnNetStreamSocketError definitely throws an exception so clear up heap
 			delete[] buf;
-			BailOnSocketError( "tcpip::Socket::receive() @ recv" );
+			BailOnNetStreamSocketError( "netstream::NetStreamSocket::receive() @ recv" );
 		}
 
 		b.resize(a);
@@ -456,7 +455,7 @@ namespace tcpip
 
 		if (verbose_) 
 		{
-			cerr << "Rcvd "  << a <<  " bytes via tcpip::Socket: [";
+			cerr << "Rcvd "  << a <<  " bytes via netstream::NetStreamSocket: [";
 			for(int i = 0; i < a; ++i)
 			{
 				cerr << " " << (int)b[i] << " ";
@@ -472,9 +471,9 @@ namespace tcpip
 	
 
 	bool
-		Socket::
-		receiveExact( Storage &msg )
-		throw( SocketException )
+		NetStreamSocket::
+		receiveExact( NetStreamStorage &msg )
+		throw( NetStreamSocketException )
 	{
 		/* receive length of vector */
 		unsigned char * const bufLength = new unsigned char[4];
@@ -487,14 +486,14 @@ namespace tcpip
 
 			if( readThisTime <= 0 )
 			{
-				// BailOnSocketError definitely throws an exception so clear up heap
+				// BailOnNetStreamSocketError definitely throws an exception so clear up heap
 				delete[] bufLength;
-				BailOnSocketError( "tcpip::Socket::receive() @ recv" );
+				BailOnNetStreamSocketError( "NetStreamSocket::receive() @ recv" );
 			}
 
 			bytesRead += readThisTime;
 		}
-		Storage length_storage(bufLength,4);
+		NetStreamStorage length_storage(bufLength,4);
 		int NN = length_storage.readInt() - 4;
 
 		/* receive vector */
@@ -508,10 +507,10 @@ namespace tcpip
 
 			if( readThisTime <= 0 )
 			{
-				// BailOnSocketError definitely throws an exception so clear up heap
+				// BailOnNetStreamSocketError definitely throws an exception so clear up heap
 				delete[] bufLength;
 				delete[] buf;
-				BailOnSocketError( "tcpip::Socket::receive() @ recv" );
+				BailOnNetStreamSocketError( "netstream::NetStreamSocket::receive() @ recv" );
 			}
 
 			bytesRead += readThisTime;
@@ -521,7 +520,7 @@ namespace tcpip
 		
 		if (verbose_)
 		{
-			cerr << "Rcvd Storage with "  << 4 + NN <<  " bytes via tcpip::Socket: [";
+			cerr << "Rcvd Storage with "  << 4 + NN <<  " bytes via netstream::NetStreamSocket: [";
 			for (int i=0; i < 4; ++i)
 			{
 				cerr << " " << (int)bufLength[i] << " ";
@@ -541,7 +540,7 @@ namespace tcpip
 	
 	// ----------------------------------------------------------------------
 	bool 
-		Socket::
+		NetStreamSocket::
 		has_client_connection() 
 		const
 	{
@@ -550,7 +549,7 @@ namespace tcpip
 
 	// ----------------------------------------------------------------------
 	bool 
-		Socket::
+		NetStreamSocket::
 		is_blocking() 
 		throw()
 	{
@@ -561,7 +560,7 @@ namespace tcpip
 #ifdef WIN32
 	// ----------------------------------------------------------------------
 	std::string 
-		Socket::
+		NetStreamSocket::
 		GetWinsockErrorString(int err) 
 		const
 	{
@@ -578,13 +577,13 @@ namespace tcpip
 		case WSAEWOULDBLOCK:	return "Operation would block";
 		case WSAEINPROGRESS:	return "Operation now in progress";
 		case WSAEALREADY:		return "Operation already in progress";
-		case WSAENOTSOCK:		return "Socket operation on non-socket";
+		case WSAENOTSOCK:		return "NetStreamSocket operation on non-socket";
 		case WSAEDESTADDRREQ:	return "Destination address required";
 		case WSAEMSGSIZE:		return "Message too long";
 		case WSAEPROTOTYPE:		return "Protocol wrong type for socket";
 		case WSAENOPROTOOPT:	return "Bad protocol option";
 		case WSAEPROTONOSUPPORT:	return "Protocol not supported";
-		case WSAESOCKTNOSUPPORT:	return "Socket type not supported";
+		case WSAESOCKTNOSUPPORT:	return "NetStreamSocket type not supported";
 		case WSAEOPNOTSUPP:		return "Operation not supported on socket";
 		case WSAEPFNOSUPPORT:	return "Protocol family not supported";
 		case WSAEAFNOSUPPORT:	return "Address family not supported";
@@ -592,16 +591,16 @@ namespace tcpip
 		case WSAEADDRNOTAVAIL:	return "Can't assign requested address";
 		case WSAENETDOWN:		return "Network is down";
 		case WSAENETUNREACH:	return "Network is unreachable";
-		case WSAENETRESET:		return "Net Socket reset";
-		case WSAECONNABORTED:	return "Software caused tcpip::Socket abort";
-		case WSAECONNRESET:		return "Socket reset by peer";
+		case WSAENETRESET:		return "Net NetStreamSocket reset";
+		case WSAECONNABORTED:	return "Software caused netstream::NetStreamSocket abort";
+		case WSAECONNRESET:		return "NetStreamSocket reset by peer";
 		case WSAENOBUFS:		return "No buffer space available";
-		case WSAEISCONN:		return "Socket is already connected";
-		case WSAENOTCONN:		return "Socket is not connected";
+		case WSAEISCONN:		return "NetStreamSocket is already connected";
+		case WSAENOTCONN:		return "NetStreamSocket is not connected";
 		case WSAESHUTDOWN:		return "Can't send after socket shutdown";
 		case WSAETOOMANYREFS:	return "Too many references, can't splice";
-		case WSAETIMEDOUT:		return "Socket timed out";
-		case WSAECONNREFUSED:	return "Socket refused";
+		case WSAETIMEDOUT:		return "NetStreamSocket timed out";
+		case WSAECONNREFUSED:	return "NetStreamSocket refused";
 		case WSAELOOP:			return "Too many levels of symbolic links";
 		case WSAENAMETOOLONG:	return "File name too long";
 		case WSAEHOSTDOWN:		return "Host is down";
@@ -627,7 +626,6 @@ namespace tcpip
 
 } // namespace tcpip
 
-#endif // BUILD_TCPIP
 
 /*-----------------------------------------------------------------------
 * Source  $Source: $

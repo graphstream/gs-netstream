@@ -13,13 +13,13 @@
 
 #include <iostream>
 #include <sstream>
-#include "tcpip/storage.h"
-#include "tcpip/socket.h"
+#include "netstream-storage.h"
+#include "netstream-socket.h"
 #include "netstream-constants.h"
 #include "netstream-sender.h"
 
-using namespace tcpip;
 using namespace std;
+using namespace netstream;
 
 void events_test();
 void types_test();
