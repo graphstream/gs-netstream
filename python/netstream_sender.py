@@ -229,6 +229,8 @@ class NetStreamSender(AttributeSink,ElementSink):
     type = self._getType(old_value)
     event = event + self._encodeByte(type)
     event = event + self._encodeValue(old_value,type)
+    type = self._getType(new_value)
+    event = event + self._encodeByte(type)
     event = event + self._encodeValue(new_value,type)
     self.transport.send(event)
   
@@ -256,6 +258,8 @@ class NetStreamSender(AttributeSink,ElementSink):
     type = self._getType(old_value)
     event = event + self._encodeByte(type)
     event = event + self._encodeValue(old_value,type)
+    type = self._getType(new_value)
+    event = event + self._encodeByte(type)
     event = event + self._encodeValue(new_value,type)
     self.transport.send(event)
   
@@ -284,6 +288,8 @@ class NetStreamSender(AttributeSink,ElementSink):
     type = self._getType(old_value)
     event = event + self._encodeByte(type)
     event = event + self._encodeValue(old_value,type)
+    type = self._getType(new_value)
+    event = event + self._encodeByte(type)
     event = event + self._encodeValue(new_value,type)
     self.transport.send(event)
   
@@ -343,6 +349,8 @@ def example():
   
   stream.graphAttributeAdded(source_id, time_id,"stylesheet", ss);time_id+=1;
   stream.graphAttributeAdded(source_id, time_id,"ui.antialias", True);time_id+=1;
+  stream.graphAttributeAdded(source_id, time_id,"test", "foo");time_id+=1;
+  stream.graphAttributeChanged(source_id, time_id,"test", "foo", False);time_id+=1;
   stream.graphAttributeAdded(source_id, time_id,"layout.stabilization-limit", 0);time_id+=1;
   for i in range(0,500):
     stream.nodeAdded(source_id, time_id,str(i));time_id+=1;
