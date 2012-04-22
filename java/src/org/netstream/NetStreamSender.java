@@ -38,6 +38,7 @@ import java.nio.charset.Charset;
 
 import org.netstream.packing.NetStreamPacker;
 
+
 /**
  * <p>
  * This class implements a sender according to specifications the NetStream
@@ -64,7 +65,8 @@ import org.netstream.packing.NetStreamPacker;
  * @author Yoann Pigné
  * 
  */
-public class NetStreamSender {
+
+public class NetStreamSender{
 	protected String stream;
 	byte[] streamIdArray;
 	protected String host;
@@ -496,11 +498,12 @@ public class NetStreamSender {
 			sourceIdBuff = sourceId.getBytes(Charset.forName("UTF-8"));
 		}
 		byte[] attrArray = attribute.getBytes(Charset.forName("UTF-8"));
-		int valueType = getType(oldValue);
+		int oldValueType = getType(oldValue);
+		int newValueType = getType(newValue);
 
-		ByteBuffer bOldValue = encodeValue(oldValue, valueType);
+		ByteBuffer bOldValue = encodeValue(oldValue, oldValueType);
 		bOldValue.flip();
-		ByteBuffer bNewValue = encodeValue(newValue, valueType);
+		ByteBuffer bNewValue = encodeValue(newValue, newValueType);
 		bNewValue.flip();
 
 		ByteBuffer buff = ByteBuffer.allocate(4 + streamIdArray.length + // Stream
@@ -509,13 +512,19 @@ public class NetStreamSender {
 				4 + sourceIdBuff.length + // source id
 				8 + // timeId
 				4 + attrArray.length + // attr name
-				1 + bOldValue.capacity() + bNewValue.capacity()); // values
+				1 + // value type
+				bOldValue.capacity() + 
+				1 + // value type
+				bNewValue.capacity()); // values
 
 		buff.putInt(streamIdArray.length).put(streamIdArray)
 				.put((byte) NetStreamConstants.EVENT_CHG_GRAPH_ATTR)
 				.putInt(sourceIdBuff.length).put(sourceIdBuff).putLong(timeId)
-				.putInt(attrArray.length).put(attrArray).put((byte) valueType)
-				.put(bOldValue).put(bNewValue);
+				.putInt(attrArray.length).put(attrArray)
+				.put((byte) oldValueType)
+				.put(bOldValue)
+				.put((byte) newValueType)
+				.put(bNewValue);
 
 		doSend(buff);
 
@@ -614,11 +623,12 @@ public class NetStreamSender {
 		}
 		byte[] attrArray = attribute.getBytes(Charset.forName("UTF-8"));
 		byte[] nodeIdArray = nodeId.getBytes(Charset.forName("UTF-8"));
-		int valueType = getType(oldValue);
+		int oldValueType = getType(oldValue);
+		int newValueType = getType(newValue);
 
-		ByteBuffer bOldValue = encodeValue(oldValue, valueType);
+		ByteBuffer bOldValue = encodeValue(oldValue, oldValueType);
 		bOldValue.flip();
-		ByteBuffer bNewValue = encodeValue(newValue, valueType);
+		ByteBuffer bNewValue = encodeValue(newValue, newValueType);
 		bNewValue.flip();
 
 		ByteBuffer buff = ByteBuffer.allocate(4 + streamIdArray.length + // stream
@@ -629,6 +639,7 @@ public class NetStreamSender {
 				(4 + attrArray.length) + // attribute
 				1 + // value type
 				bOldValue.capacity() + // value
+				1 + // value type
 				bNewValue.capacity() // new value
 		);
 
@@ -639,8 +650,9 @@ public class NetStreamSender {
 				.putInt(sourceIdBuff.length).put(sourceIdBuff).putLong(timeId)
 				.putInt(nodeIdArray.length).put(nodeIdArray) // nodeId
 				.putInt(attrArray.length).put(attrArray) // attribute
-				.put((byte) valueType) // value type
+				.put((byte) oldValueType) // value type
 				.put(bOldValue) // value
+				.put((byte) newValueType) // value type
 				.put(bNewValue); // value
 		doSend(buff);
 	}
@@ -742,11 +754,12 @@ public class NetStreamSender {
 		}
 		byte[] edgeIdArray = edgeId.getBytes(Charset.forName("UTF-8"));
 		byte[] attrArray = attribute.getBytes(Charset.forName("UTF-8"));
-		int valueType = getType(oldValue);
+		int oldValueType = getType(oldValue);
+		int newValueType = getType(newValue);
 
-		ByteBuffer bOldValue = encodeValue(oldValue, valueType);
+		ByteBuffer bOldValue = encodeValue(oldValue, oldValueType);
 		bOldValue.flip();
-		ByteBuffer bNewValue = encodeValue(newValue, valueType);
+		ByteBuffer bNewValue = encodeValue(newValue, newValueType);
 		bNewValue.flip();
 
 		ByteBuffer buff = ByteBuffer.allocate(4 + streamIdArray.length + // stream
@@ -758,6 +771,7 @@ public class NetStreamSender {
 				(4 + attrArray.length) + // attribute
 				1 + // value type
 				bOldValue.capacity() + // value
+				1 + // value type
 				bNewValue.capacity() // new value
 		);
 
@@ -768,8 +782,9 @@ public class NetStreamSender {
 				.putInt(sourceIdBuff.length).put(sourceIdBuff).putLong(timeId)
 				.putInt(edgeIdArray.length).put(edgeIdArray) // nodeId
 				.putInt(attrArray.length).put(attrArray) // attribute
-				.put((byte) valueType) // value type
+				.put((byte) oldValueType) // value type
 				.put(bOldValue) // value
+				.put((byte) newValueType) // value type
 				.put(bNewValue); // value
 
 		doSend(buff);
