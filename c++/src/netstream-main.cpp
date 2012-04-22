@@ -37,7 +37,7 @@ int main (int argc, char const *argv[])
 void e(){
   string source_id="C++_netstream_test";
   long time_id=0L;
-   NetStreamSender stream("default","10.91.100.76",2001,false);
+   NetStreamSender stream("default","localhost",2001,false);
   string n1("node");
   while(1) {
         //stream.changeNodeAttribute(n1,att,old,n);
@@ -55,6 +55,8 @@ void example(){
   NetStreamSender stream("default","localhost",2001,false);
   string style("node{fill-mode:plain;fill-color:#567;size:6px;}");
   stream.addGraphAttribute(source_id, time_id++, "stylesheet", style);
+  stream.addGraphAttribute(source_id, time_id++, "test", "test");
+  stream.changeGraphAttribute(source_id, time_id++, "test", "test",false);
   stream.addGraphAttribute(source_id, time_id++, "ui.antialias", true);
   stream.addGraphAttribute(source_id, time_id++, "layout.stabilization-limit", 0);
   for (int i = 0; i < 500; i++) {

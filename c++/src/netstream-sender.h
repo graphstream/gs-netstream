@@ -124,15 +124,16 @@ public:
    _sendEvent(event);    
   }
 
-  template <typename T>
-  void changeGraphAttribute(const string & source_id, long time_id, const string & attribute, const T oldValue, const T newValue){
+  template <typename T1, typename T2>
+  void changeGraphAttribute(const string & source_id, long time_id, const string & attribute, const T1 & oldValue, const T2 & newValue){
      NetStreamStorage event = NetStreamStorage();
      event.writeByte(EVENT_CHG_GRAPH_ATTR);
      event.writeString(source_id);
      event.writeLong(time_id);
      event.writeString(attribute);
-     event.writeByte(getType(newValue));
+     event.writeByte(getType(oldValue));
      encode(event, oldValue);
+     event.writeByte(getType(newValue));
      encode(event, newValue);
      _sendEvent(event);
   }
@@ -152,16 +153,17 @@ public:
     _sendEvent(event);
   }
 
-  template <typename T>
-  void changeNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute, const T & oldValue, const T & newValue){
+  template <typename T1, typename T2>
+  void changeNodeAttribute(const string & source_id, long time_id, const string & node_id, const string & attribute, const T1 & oldValue, const T2 & newValue){
     NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_CHG_NODE_ATTR);
     event.writeString(source_id);
     event.writeLong(time_id);
     event.writeString(node_id);
     event.writeString(attribute);
-    event.writeByte(getType(newValue));
+    event.writeByte(getType(oldValue));
     encode(event, oldValue);
+    event.writeByte(getType(newValue));
     encode(event, newValue);
     _sendEvent(event);
   }
@@ -182,16 +184,17 @@ public:
     
   }
 
-  template <typename T>
-  void changeEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute, const T & oldValue, const T & newValue){
+  template <typename T1, typename T2>
+  void changeEdgeAttribute(const string & source_id, long time_id, const string & edge_id, const string & attribute, const T1 & oldValue, const T2 & newValue){
     NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_CHG_EDGE_ATTR);
     event.writeString(source_id);
     event.writeLong(time_id);
     event.writeString(edge_id);
     event.writeString(attribute);
-    event.writeByte(getType(newValue));
+    event.writeByte(getType(oldValue));
     encode(event, oldValue);
+    event.writeByte(getType(newValue));
     encode(event, newValue);
     _sendEvent(event);
   }
