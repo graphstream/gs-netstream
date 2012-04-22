@@ -14,6 +14,7 @@ For now here are the implementations that are proposed:
 
 - a python sender
 - a C++ sender
+- a Java sender with no dependency to gs-core (useful for java projects that don't want any dependency to the GS binaries)
 
 
 If you need to implement a sender or a receiver in another language,
