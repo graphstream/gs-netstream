@@ -15,7 +15,7 @@
 
 // Copyright (c) 2008 notmasteryet
 global.netstream.TypedArrayReader = function (t_array) {
-    "use strict";
+    
     this.position = 0;
     this.array = new Uint8Array(t_array.buffer, t_array.byteOffset, t_array.byteLength);
     this.readByte = function () {
@@ -93,19 +93,18 @@ global.netstream.Utf8Translator = function (reader) {
 //   BEING USED
 //
 global.netstream.typedArrayToString = function (input) {
-    "use strict";
+    
     var reader = new netstream.TypedArrayReader(input),
     utf8 = new netstream.Utf8Translator(reader),
     result = [],
     i = 0,
     ch = 0,
     s = "";
-    do {
-        ch = utf8.readChar();
+    ch = utf8.readChar();
+    while (ch.charCodeAt(0) !== 0) {
         result[i++] = ch;
+        ch = utf8.readChar();        
     }
-    while (ch.charCodeAt(0) !== 0);
-
     s = result.join("");
     return s;
 }
