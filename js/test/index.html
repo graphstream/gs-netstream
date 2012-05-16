@@ -1,0 +1,28 @@
+<html>
+<head>
+  
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Web Socket Example</title> 
+
+</head> 
+<body> 
+   <div id="debug"></div> 
+   <div id="holder" style="width:600px; height:300px"></div>
+   
+   <script src="/lib/netstream_constants.js" type="text/javascript"></script> 
+   <script src="/lib/netstream_commons.js" type="text/javascript"></script> 
+   <script src="/lib/netstream_receiver.js" type="text/javascript"></script> 
+
+   <script>
+(function() {
+   var elmt = document.getElementById("debug")
+   var handler = new netstream.DOMGSSink(elmt);
+   
+   var transport = new netstream.Receiver("ws", "localhost", "2003", "/gs/stream", handler);
+   transport.debug =  true;
+})();
+   </script>
+</body> 
+</html>
