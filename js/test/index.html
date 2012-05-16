@@ -21,7 +21,7 @@
    var elmt = document.getElementById("debug")
    var handler = new netstream.DOMGSSink(elmt);
    
-   var transport = new netstream.Receiver("ws", "172.17.22.154", "2003", "/gs/stream", handler);
+   var transport = new netstream.Receiver("ws", "127.0.0.1", "2003", "/gs/stream", handler);
    // transport.debug =  true;
 })();
    </script>

@@ -1,9 +1,10 @@
 
-var SERVER_IP = "172.17.22.154";
+var SERVER_IP = "127.0.0.1";
 
 var http = require('http')
     , fs = require('fs')
     , WebSocketServer = require('ws').Server
+    , WebSocket = require('ws')
     , sourceID="nodeServer"
     , timeID=0
     , net = require('net')
@@ -67,7 +68,9 @@ wss.on('connection', function(ws) {
          console.log('events_server disconnected');
        });
        c.on("data", function (data) {
-           ws.send(data);
+           if(ws.readyState === WebSocket.OPEN){
+               ws.send(data);
+           }
          });
      });
      events_server.listen(function() { //'listening' listener
