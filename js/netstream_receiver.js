@@ -148,7 +148,7 @@
         this.SERVER_PORT = server_port || 2003;
         this.SERVER_WS_PATH = server_ws_path || "/gs/stream";
         this.gs_sink = gs_sink || new netstream.DefaultGSSink();
-        this.debug = true;
+        this.debug = false;
 
         // wrapping this
         var gs = this;
