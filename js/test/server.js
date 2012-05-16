@@ -1,3 +1,6 @@
+
+var SERVER_IP = "172.17.22.154";
+
 var http = require('http')
     , fs = require('fs')
     , WebSocketServer = require('ws').Server
@@ -15,7 +18,7 @@ netstream.constants = require("../netstream_constants").netstream.constants;
 //
 http.createServer(function (request, response) {
  
-    //console.log('request starting... '+request.url);
+    console.log('request starting... '+request.url);
      
     fs.readFile('./'+request.url, function(error, content) {
         if (error) {
@@ -41,8 +44,10 @@ console.log('Http Server running at http://127.0.0.1:8080/');
 
 
 
-var wss = new WebSocketServer({port: 2003});
-
+var wss = new WebSocketServer({port: 2003, host:SERVER_IP});
+wss.on('error', function(){
+    console.log('WS error....');
+});
 wss.on('connection', function(ws) {
     
     console.log("WS Client connected to node");
