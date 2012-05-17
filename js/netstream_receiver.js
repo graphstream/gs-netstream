@@ -326,6 +326,17 @@
             var nbytes = 0;
             // Number of bytes this.read.
             nbytes = encodedMsg.length;
+            if(nbytes > this.buffer.byteLength){
+                if(this.debug){
+                    console.log("resizing buffer size to "+(2*nbytes+this.pos)+" bytes");
+                }
+                var newb = new ArrayBuffer(2*nbytes+this.pos);
+                for(var i=0; i< this.pos; i++){
+                    newb[i]=this.buffer[i];
+                }
+                delete this.buffer;
+                this.buffer=newb;
+            }
             var encodedArray = new Uint8Array(this.buffer, this.pos, nbytes);
             for (var i = 0; i < nbytes; i++) {
                 encodedArray[i] = encodedMsg.charCodeAt(i);
