@@ -177,7 +177,7 @@
         this.socket.onmessage = function (e) {
             if (e.data != "Heartbeat") {
                 if (gs.debug === true) {
-                    netstream.LOGGER("(gs_transport): < Received a " + e.data.length + " bytes long data chunk: "+e.data);
+                    netstream.LOGGER("(gs_transport): < Received a " + e.data.length + " bytes long data chunk.");
                 }
                 gs.handleMsg(e.data);
             }
@@ -202,7 +202,7 @@
                     clearInterval(gs.refreshIntervalId);
                 }
                 else {
-                    if (this.debug) {
+                    if (gs.debug) {
                         netstream.LOGGER("> Sending Hearbeat");
                     }
                     gs.socket.send("Heartbeat");
@@ -246,12 +246,12 @@
             msgIndex = res.index;
             if (this.debug) {
                 netstream.LOGGER("(GSTransport): Stream " + stream + " is addressed in this message");
-                var m=[]
-                     ,arr = new Uint8Array(msg.buffer);
-                for(var i =0; i< arr.length; i++){
-                    m[i]=arr[i]
-                }
-                netstream.LOGGER(m.join(', '));
+                // var m=[]
+                //                      ,arr = new Uint8Array(msg.buffer);
+                //                 for(var i =0; i< arr.length; i++){
+                //                     m[i]=arr[i]
+                //                 }
+                //                 netstream.LOGGER(m.join(', '));
             }
             // get the command
             var cmd = -1;
@@ -319,6 +319,21 @@
             return 0;
         },
 
+        ensureBufferCapacity: function (size) {
+            if (size > this.buffer.byteLength) {
+                if (this.debug) {
+                    console.log("Actual buffer size is " + this.buffer.byteLength + " resizing to " + (2 * size + this.pos) + " bytes", size, this.pos);
+                }
+                var newb = new ArrayBuffer(2 * size + this.pos)
+                    , i=0;
+                for (; i < this.pos; i++) {
+                    newb[i] = this.buffer[i];
+                }
+                delete this.buffer;
+                this.buffer = newb;
+            }
+       },
+        
         handleMsg: function (encodedMsg) {
             var limit = 0;
             // Index past the last byte this.read during the current
@@ -326,17 +341,7 @@
             var nbytes = 0;
             // Number of bytes this.read.
             nbytes = encodedMsg.length;
-            if(nbytes > this.buffer.byteLength){
-                if(this.debug){
-                    console.log("resizing buffer size to "+(2*nbytes+this.pos)+" bytes");
-                }
-                var newb = new ArrayBuffer(2*nbytes+this.pos);
-                for(var i=0; i< this.pos; i++){
-                    newb[i]=this.buffer[i];
-                }
-                delete this.buffer;
-                this.buffer=newb;
-            }
+            this.ensureBufferCapacity(nbytes);
             var encodedArray = new Uint8Array(this.buffer, this.pos, nbytes);
             for (var i = 0; i < nbytes; i++) {
                 encodedArray[i] = encodedMsg.charCodeAt(i);
