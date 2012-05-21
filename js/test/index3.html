@@ -1,0 +1,68 @@
+<html>
+<head>
+  
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Web Socket Example</title> 
+
+</head> 
+<body> 
+   <div id="debug"></div> 
+   <div id="holder" style="width:600px; height:300px"></div>
+   
+   <script src="/lib/netstream_constants.js" type="text/javascript"></script> 
+   <script src="/lib/netstream_commons.js" type="text/javascript"></script> 
+   <script src="/lib/data_view.js" type="text/javascript"></script> 
+   <script src="/lib/netstream_transport.js" type="text/javascript"></script> 
+   <script src="/lib/netstream_receiver.js" type="text/javascript"></script> 
+   <script src="/lib/netstream_sender.js" type="text/javascript"></script> 
+
+   <script>
+(function() {
+  
+  
+  // ------- the socket itself (and a bit more)
+  var transport = new netstream.Transport({
+    'host': "localhost",
+    'port': 2003,
+    'uri': '/',
+    'base64': true,
+    'debug': false
+  });
+
+  // ------- receives events from the socket
+  var sink = new netstream.DOMSink(document.getElementById("debug"));
+  var receiver = new netstream.Receiver({
+    'debug': false,
+    'transport': transport,
+    'sink': sink
+  });
+
+
+  // -------- send events through the socket
+  var sender = new netstream.Sender({
+    'debug': false,
+    'transport': transport
+  });
+  
+  // -------- a utility objects that handles sourceIds and timeIds for us
+  source = new netstream.Source({
+    'sender': sender
+  });
+
+
+  var ss = "node{fill-mode:plain;fill-color:#567;size:6px;}";
+  source.addAttribute("stylesheet", ss);
+  source.addAttribute("ui.antialias", true);
+  source.addAttribute("layout.stabilization-limit", 0);
+  source.addNode('0');
+  source.addNode('1');
+  source.addNode('2');
+  source.addNode('3');
+
+} ());
+
+   </script>
+</body> 
+</html>
