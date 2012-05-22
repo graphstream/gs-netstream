@@ -30,6 +30,7 @@
     'base64': true,
     'debug': false
   });
+  transport.connect();
 
   // ------- receives events from the socket
   var sink = new netstream.DOMSink(document.getElementById("debug"));
@@ -51,7 +52,7 @@
     'sender': sender
   });
 
-
+  console.log("My name is %s", source.id);
   var ss = "node{fill-mode:plain;fill-color:#567;size:6px;}";
   source.addAttribute("stylesheet", ss);
   source.addAttribute("ui.antialias", true);
@@ -60,7 +61,14 @@
   source.addNode('1');
   source.addNode('2');
   source.addNode('3');
-
+  source.addNode(source.id+'0');
+  source.addNode(source.id+'1');
+  source.addNode(source.id+'2');
+  source.addNode(source.id+'3');
+  source.addEdge(source.id+'00', source.id+'0', ''+Math.floor(Math.random()*4),  false);
+  source.addEdge(source.id+'01', source.id+'1', ''+Math.floor(Math.random()*4),  false);
+  source.addEdge(source.id+'02', source.id+'2', ''+Math.floor(Math.random()*4),  false);
+  source.addEdge(source.id+'03', source.id+'3', ''+Math.floor(Math.random()*4),  false);
 } ());
 
    </script>

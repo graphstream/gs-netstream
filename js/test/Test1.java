@@ -26,7 +26,7 @@ import org.graphstream.stream.netstream.packing.Base64Packer;
 /**
  * 
  */
-public class NetStreamWebSocketTest {
+public class Test1 {
 	String clientSentence;
     String capitalizedSentence;
     
@@ -35,9 +35,9 @@ public class NetStreamWebSocketTest {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		new NetStreamWebSocketTest();
+		new Test1();
 	}
-	public NetStreamWebSocketTest() throws IOException{
+	public Test1() throws IOException{
 		ServerSocket welcomeSocket = new ServerSocket(2001);
 		System.out.println("Listening?..."); 
         while(true)
@@ -51,7 +51,15 @@ public class NetStreamWebSocketTest {
            new Thread(){
 			@Override
 			public void run() {
-				sendGraph(new Integer(clientSentence));
+				try {
+					sendGraph(new Integer(clientSentence));
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}        	   
            }.start();
            
@@ -59,13 +67,13 @@ public class NetStreamWebSocketTest {
 
 
 	}
-	public void sendGraph(int port){
+	public void sendGraph(int port) throws IOException{
 		Graph g = new MultiGraph("G");
 		// - the sender
 		NetStreamSender nsc = null;
 		try {
 			System.err.printf("Trying to connect to port %d%n",port);
-			nsc = new NetStreamSender(port);
+			nsc = new NetStreamSender("D", "localhost", port);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -84,18 +92,19 @@ public class NetStreamWebSocketTest {
 		// - generate some events on the client side
 		String style = "node{fill-mode:plain;fill-color:#567;size:6px;}";
 		g.addAttribute("stylesheet", style);
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 5000; i++) {
 			try {
-				Thread.sleep(100);
+				//Thread.sleep(500);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			g.addNode(i + "");
+			g.addNode("n"+i);
 			if (i > 0) {
-				g.addEdge(i + "-" + (i - 1), i + "", (i - 1) + "");
-				g.addEdge(i + "--" + (i / 2), i + "", (i / 2) + "");
+				g.addEdge("n"+i + "_" + "n"+(i - 1), "n"+i, "n"+(i - 1));
+				g.addEdge("n"+i + "__" + "n"+(i / 2), "n"+i , "n"+(i / 2));
 			}
 		}
+		g.write("ok.dgs");
 		System.err.printf("Done.");
 	}
 

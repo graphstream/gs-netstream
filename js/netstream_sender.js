@@ -17,7 +17,7 @@
     this.debug = true;
     this.sender = null;
     this.stream = null;
-    this.source = null;
+    this.id = null;
     
     for(var prop in options) {
       if(options.hasOwnProperty(prop) && this.hasOwnProperty(prop)) {
@@ -28,72 +28,72 @@
     if (this.stream){
       this.sender.stream = this.stream;
     }
-    this.source = this.source || "s"+Math.floor(Math.random()*1000);
+    this.id = this.id || "s"+Math.floor(Math.random()*1000);
     this._timeId = 0;
         
   };
   
   global.netstream.Source.prototype = {
     addNode: function (node){
-      this.sender.nodeAdded(this.source, this._timeId, node);
+      this.sender.nodeAdded(this.id, this._timeId, node);
       this._timeId+=1;
     },
     removeNode: function (node){
-      this.sender.nodeRemoved(this.source, this._timeId, node);
+      this.sender.nodeRemoved(this.id, this._timeId, node);
       this._timeId+=1;
     },
     addEdge: function (edge, from_node, to_node, directed){
-      this.sender.edgeAdded(this.source, this._timeId, edge, from_node, to_node, directed);
+      this.sender.edgeAdded(this.id, this._timeId, edge, from_node, to_node, directed);
       this._timeId+=1;
     },
     removeEdge: function(edge){
-      this.sender.edgeRemoved(this.source, this._timeId, edge);
+      this.sender.edgeRemoved(this.id, this._timeId, edge);
       this._timeId+=1;
     },
     addAttribute: function (attribute, value){
-      this.sender.graphAttributeAdded(this.source, this._timeId, attribute, value);
+      this.sender.graphAttributeAdded(this.id, this._timeId, attribute, value);
       this._timeId+=1;
     },
     removeAttribute: function (attribute){
-      this.sender.graphAttributeRemoved(this.source, this._timeId, attribute);
+      this.sender.graphAttributeRemoved(this.id, this._timeId, attribute);
       this._timeId+=1;
     },
     changeAttribute: function (attribute, oldValue, newValue){
-      this.sender.graphAttributeChanged(this.source, this._timeId, attribute, oldValue, newValue);
+      this.sender.graphAttributeChanged(this.id, this._timeId, attribute, oldValue, newValue);
       this._timeId+=1;
     },
     
     addNodeAttribute: function (node, attribute, value){
-      this.sender.nodeAttributeAdded(this.source, this._timeId, node, attribute, value);
+      this.sender.nodeAttributeAdded(this.id, this._timeId, node, attribute, value);
       this._timeId+=1;
     },
     removeNodeAttibute: function(node, attribute){
-      this.sender.nodeAttributeRemoved(this.source, this._timeId, node, attribute);
+      this.sender.nodeAttributeRemoved(this.id, this._timeId, node, attribute);
       this._timeId+=1;
     },
     changeNodeAttribute: function(node, attribute, oldValue, newValue){
-      this.sender.nodeAttributeChanged(this.source, this._timeId, node, attribute, oldValue, newValue);
+      this.sender.nodeAttributeChanged(this.id, this._timeId, node, attribute, oldValue, newValue);
       this._timeId+=1;
     },
     
     addEdgeAttribute: function (edge, attribute, value){
-      this.sender.edgeAttributeAdded(this.source, this._timeId, edge, attribute, value);
+      this.sender.edgeAttributeAdded(this.id, this._timeId, edge, attribute, value);
       this._timeId+=1;
     },
     removeEdgeAttribute: function (edge, attribute){
-      this.sender.edgeAttributeRemoved(this.source, this._timeId, edge, attribute);
+      this.sender.edgeAttributeRemoved(this.id, this._timeId, edge, attribute);
       this._timeId+=1;
     },
     changeEdgeAttrivute: function (edge, attribute, oldValue, newValue){
-      this.sender.edgeAttributeChanged(this.source, this._timeId, edge, attribute, oldValue, newValue);
+      this.sender.edgeAttributeChanged(this.id, this._timeId, edge, attribute, oldValue, newValue);
       this._timeId+=1;
     },
     clearGraph: function (){
-      this.sender.graphCleared(this.source, this._timeId);
+      this.sender.graphCleared(this.id, this._timeId);
       this._timeId+=1;
     },
     stepBegins: function (time){
-      this.sender.stepBegins(this.source, this._timeId, time);
+      this.sender.stepBegins(this.id, this._timeId, time);
       this._timeId+=1;
     }
   };

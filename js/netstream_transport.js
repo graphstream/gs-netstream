@@ -116,7 +116,7 @@
       
     },
     sendEvent: function(buffer, start, length){
-      netstream.LOGGER("(netstream.transport.sendEvent) with buffer:"+buffer.byteLength+" ("+start+","+length+")");
+      //netstream.LOGGER("(netstream.transport.sendEvent) with buffer:"+buffer.byteLength+" ("+start+","+length+")");
       
       
       // prepare buffer 

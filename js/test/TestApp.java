@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.AdjacencyListGraph;
 import org.graphstream.graph.implementations.DefaultGraph;
+import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.stream.GraphReplay;
 import org.graphstream.stream.netstream.NetStreamReceiver;
 import org.graphstream.stream.netstream.NetStreamSender;
@@ -31,23 +32,23 @@ import org.graphstream.stream.thread.ThreadProxyPipe;
 /**
  * 
  */
-public class W3SinkDemo {
+public class TestApp {
     boolean alive;
     ServerSocket serverSocket;
     Graph g;
     ConcurrentLinkedQueue<Connection> pending;
     LinkedList<Connection> active;
 	
-	public W3SinkDemo() throws IOException {
+	public TestApp() throws IOException {
 		this.serverSocket = new ServerSocket(2001); 
 		this.alive = true;
 		this.pending = new ConcurrentLinkedQueue<Connection>();
-		this.g = new AdjacencyListGraph("w3sink-demo");
+		this.g = new MultiGraph("w3sink-demo", false, true);
 		this.active = new LinkedList<Connection>();
 		
         Runnable r = new Runnable() {
         	public void run() {
-        		W3SinkDemo.this.listen();
+        		TestApp.this.listen();
         	}
         };
         
@@ -58,7 +59,7 @@ public class W3SinkDemo {
         r = new Runnable() {
         	public void run() {
         		try {
-					W3SinkDemo.this.handleGraph();
+					TestApp.this.handleGraph();
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -75,7 +76,7 @@ public class W3SinkDemo {
 		System.out.printf(" * graph running ...\n");
 		
 		
-		NetStreamReceiver receiver = new NetStreamReceiver("localhost", 2002, true);
+		NetStreamReceiver receiver = new NetStreamReceiver("localhost", 2002);
 		receiver.setUnpacker(new Base64Unpacker());
 		
 		ThreadProxyPipe pipe = receiver.getDefaultStream();
@@ -174,7 +175,7 @@ public class W3SinkDemo {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		new W3SinkDemo();
+		new TestApp();
 	}
 	
 		
