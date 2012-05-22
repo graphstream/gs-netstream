@@ -55,7 +55,7 @@
             this.appendMsg("(GSSink, " + sourceId + ":" + timeId + ") : ae \"" + edgeId + "\" \"" + from + (directed === true ? "\">\"": "\" \"") + to + "\"");
         },
         edgeRemoved: function (sourceId, timeId, edgeId) {
-            this.appendMsg("(GSSink, " + sourceId + ":" + timeId + ") : de \"" + nodeId + "\"");
+            this.appendMsg("(GSSink, " + sourceId + ":" + timeId + ") : de \"" + edgeId + "\"");
         },
         edgeAttributeAdded: function (sourceId, timeId, edgeId, attrId, value) {
             this.appendMsg("(GSSink, " + sourceId + ":" + timeId + ") : ce \"" + edgeId + "\" \"" + attrId + "\":" + value);
@@ -107,7 +107,7 @@
             netstream.LOGGER("(GSSink, " + sourceId + ":" + timeId + ") : ae \"" + edgeId + "\" \"" + from + (directed === true ? "\">\"": "\" \"") + to + "\"");
         },
         edgeRemoved: function (sourceId, timeId, edgeId) {
-            netstream.LOGGER("(GSSink, " + sourceId + ":" + timeId + ") : de \"" + nodeId + "\"");
+            netstream.LOGGER("(GSSink, " + sourceId + ":" + timeId + ") : de \"" + edgeId + "\"");
         },
         edgeAttributeAdded: function (sourceId, timeId, edgeId, attrId, value) {
             netstream.LOGGER("(GSSink, " + sourceId + ":" + timeId + ") : ce \"" + edgeId + "\" \"" + attrId + "\":" + value);
