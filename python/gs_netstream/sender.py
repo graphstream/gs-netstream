@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-netstream_sender.py
+sender.py
 
 This module implements a NetStream Sender
 
@@ -15,8 +15,8 @@ import struct
 import types
 import base64
 from random import random
-from graphstream import AttributeSink, ElementSink
-from netstream_constants import *
+from common import AttributeSink, ElementSink
+from constants import *
 
 
 class NetStreamTransport(object):

@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-graphstream.py
-
-
+common.py
 
 Created by Yoann Pigné on 2011-08-21.
 Copyright (c) 2011 University of Luxembourg. All rights reserved.
