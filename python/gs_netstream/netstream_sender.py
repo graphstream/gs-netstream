@@ -14,8 +14,10 @@ import socket
 import struct
 import types
 import base64
+from random import random
 from graphstream import AttributeSink, ElementSink
 from netstream_constants import *
+
 
 class NetStreamTransport(object):
    """Defines the general behaviour of the class that will be in charge of the actuall data sending"""
@@ -338,6 +340,107 @@ class NetStreamSender(AttributeSink,ElementSink):
     event = event + self._encodeDouble(timestamp)
     self.transport.send(event)
 
+class NetStreamProxyGraph():
+   """ 
+   This is a utility class that handles 'source id' and 'time id' synchronization tokens. 
+   It proposes utile classes that allow to directly send events through the network pipe.
+   """
+   debug = True
+   sender = None
+   stream = None
+   source = None
+   _timeId = 0
+   
+   def __init__(self, *args, **kwargs):
+      """Constructor can be with one NetStreamSender object and a source id OR with with 4 args: Source ID, Stream ID, Host, and port number"""
+      if len(args) == 1 and isinstance(args[0], NetStreamSender):
+         if self.debug:
+            print("1 args, Initialize from sender object")
+         self.init_from_sender(("nss%d"%(1000*random())), args[0])
+      else:   
+         if len(args) == 2 and isinstance(args[0], types.StringType) and isinstance(args[1], NetStreamSender):
+            if self.debug:
+               print("2 args, Initialize from sender object")
+            self.init_from_sender(args[0], args[1])
+         else:
+            if len(args) == 4 and isinstance(args[0], types.StringType) and isinstance(args[1], types.StringType) and isinstance(args[2], types.StringType) and isinstance(args[3], types.IntType):
+               print("4 args, Initialize from args")
+               self.init_from_args(("nss%d"%(1000*random())),args[0], args[1], args[2], args[3])
+            else:
+               if len(args) == 5 and isinstance(args[0], types.StringType) and isinstance(args[1], types.StringType) and isinstance(args[2], types.StringType) and isinstance(args[3], types.StringType) and isinstance(args[4], types.IntType):
+                  print("5 args, Initialize from args")
+                  self.init_from_args(args[0], args[1], args[2], args[3], args[4])
+               else:
+                  print("Impossible to Initialize")
+   
+   def init_from_args(self, source, stream, host, port):
+     self.sender = DefaultNetSender(stream, host,port)
+     self.source = source
+   
+   def init_from_sender(self, source, sender):
+      self.sender = sender
+      self.source = source
+   
+   def addNode(self, node):
+       self.sender.nodeAdded(self.source, self._timeId, node)
+       self._timeId+=1
+   
+   def removeNode(self, node):
+       self.sender.nodeRemoved(self.source, self._timeId, node)
+       self._timeId+=1
+   
+   def addEdge(self, edge, from_node, to_node, directed):
+       self.sender.edgeAdded(self.source, self._timeId, edge, from_node, to_node, directed)
+       self._timeId+=1
+   
+   def removeEdge(self, edge):
+       self.sender.edgeRemoved(self.source, self._timeId, edge)
+       self._timeId+=1
+   
+   def addAttribute(self, attribute, value):
+       self.sender.graphAttributeAdded(self.source, self._timeId, attribute, value)
+       self._timeId+=1
+   
+   def removeAttribute(self, attribute):
+       self.sender.graphAttributeRemoved(self.source, self._timeId, attribute)
+       self._timeId+=1
+   
+   def changeAttribute(self, attribute, oldValue, newValue):
+       self.sender.graphAttributeChanged(self.source, self._timeId, attribute, oldValue, newValue)
+       self._timeId+=1
+   
+   def addNodeAttribute(self, node, attribute, value):
+       self.sender.nodeAttributeAdded(self.source, self._timeId, node, attribute, value)
+       self._timeId+=1
+   
+   def removeNodeAttibute(self, node, attribute):
+       self.sender.nodeAttributeRemoved(self.source, self._timeId, node, attribute)
+       self._timeId+=1
+   
+   def changeNodeAttribute(self, node, attribute, oldValue, newValue):
+       self.sender.nodeAttributeChanged(self.source, self._timeId, node, attribute, oldValue, newValue)
+       self._timeId+=1
+   
+   def addEdgeAttribute(self, edge, attribute, value):
+       self.sender.edgeAttributeAdded(self.source, self._timeId, edge, attribute, value)
+       self._timeId+=1
+   
+   def removeEdgeAttribute(self, edge, attribute):
+       self.sender.edgeAttributeRemoved(self.source, self._timeId, edge, attribute)
+       self._timeId+=1
+   
+   def changeEdgeAttrivute(self, edge, attribute, oldValue, newValue):
+       self.sender.edgeAttributeChanged(self.source, self._timeId, edge, attribute, oldValue, newValue)
+       self._timeId+=1
+   
+   def clearGraph(self):
+       self.sender.graphCleared(self.source, self._timeId)
+       self._timeId+=1
+   
+   def stepBegins(self, time):
+       self.sender.stepBegins(self.source, self._timeId, time)
+       self._timeId+=1
+   
 def example():
   """docstring for main"""
   
