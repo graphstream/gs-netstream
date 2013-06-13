@@ -40,29 +40,24 @@ _stream_name(stream),_host(host),_port(port),_stream(),_socket(host,port),debug(
 void NetStreamSender::init() 
 {
   _stream.writeString(_stream_name);
-  try{
-    _socket.connect();
-  } catch(NetStreamSocketException e){
-    std::cout<<"No available connection on "<<_host<<":"<<_port<<". Waiting.";
-    sleep(1);
-    _connect();
-    std::cout<<std::endl<<"Connection established."<<std::endl;
+  
+  int wait_for_server = 1;
+  while(wait_for_server){
+    try{
+      _socket.connect();
+      if(wait_for_server > 1)
+            std::cout<<std::endl<<"Connection established."<<std::endl;
+      wait_for_server = 0;
+    } catch(NetStreamSocketException e){
+      if(wait_for_server == 1) 
+        std::cout<<"No available connection on "<<_host<<":"<<_port<<". Waiting.";
+      else
+        std::cout<<"."<<std::flush;
+      wait_for_server++;
+      sleep(1);
+    }
   }
-
 }
-void NetStreamSender::_connect(){
-  try{
-    _socket.connect();
-  } catch(NetStreamSocketException e){
-    std::cout<<"."<<std::flush  ;
-    sleep(1);
-    _connect();
-  }
-}
-
-
-
-
 
 // ===========================================
 // = Values type guess (templates) =
