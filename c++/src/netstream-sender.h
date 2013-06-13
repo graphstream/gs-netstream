@@ -38,7 +38,8 @@ protected:
   bool debug;
 
   void init();
-  
+  void _connect();
+
   template <typename T>
   int getType(T t) 
   {

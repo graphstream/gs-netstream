@@ -40,7 +40,24 @@ _stream_name(stream),_host(host),_port(port),_stream(),_socket(host,port),debug(
 void NetStreamSender::init() 
 {
   _stream.writeString(_stream_name);
-  _socket.connect();
+  try{
+    _socket.connect();
+  } catch(NetStreamSocketException e){
+    std::cout<<"No available connection on "<<_host<<":"<<_port<<". Waiting.";
+    sleep(1);
+    _connect();
+    std::cout<<std::endl<<"Connection established."<<std::endl;
+  }
+
+}
+void NetStreamSender::_connect(){
+  try{
+    _socket.connect();
+  } catch(NetStreamSocketException e){
+    std::cout<<"."<<std::flush  ;
+    sleep(1);
+    _connect();
+  }
 }
 
 
