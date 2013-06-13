@@ -7,7 +7,7 @@ CC = g++
 CWARN = -W -Wall -Wshadow -Wimplicit -Wreturn-type -Wcomment -Wtrigraphs -Wformat -Wparentheses -Wpointer-arith -Wuninitialized -O
 
 CDBG = -g $(CWARN) -fno-inline
-CFLAGS = -I$(INCDIR) -03 
+CFLAGS = -I$(INCDIR) -O3 
 DFLAGS = -I$(INCDIR) -g $(CWARN) -fno-inline -DDEBUG=1
 
 CTAG = ctags
@@ -33,9 +33,10 @@ $(OUT_BINARY) : $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(OUT_BINARY)
 
 $(OUT_LIBRARY) : $(OBJS)
-	libtool -o $(OUT_LIBRARY)  $(OBJS)
+	libtool -static -o $(OUT_LIBRARY)  $(OBJS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	mkdir -p $(OBJDIR)
 	$(CC) $(CFLAGS) -c $? -o $@ 
 
 .PHONY : clean depend fresh
