@@ -34,11 +34,8 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	NetStreamStorage::NetStreamStorage(unsigned char packet[], int length)
+	NetStreamStorage::NetStreamStorage(unsigned char *packet, int length)
 	{
-		// Length is calculated, if -1, or given
-		if (length == -1) length = sizeof(packet) / sizeof(unsigned char);
-
 		store.reserve(length);
 		// Get the content
 		for(int i = 0; i < length; ++i) store.push_back(packet[i]);
