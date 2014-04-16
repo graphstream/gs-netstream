@@ -13,6 +13,8 @@
 
 #include <iostream>
 #include <sstream>
+
+#include "netstream-sizes.h"
 #include "netstream-storage.h"
 #include "netstream-socket.h"
 #include "netstream-constants.h"
@@ -36,7 +38,7 @@ int main (int argc, char const *argv[])
 
 void e(){
   string source_id="C++_netstream_test";
-  long time_id=0L;
+  GS_LONG time_id=0L;
    NetStreamSender stream("default","localhost",2001,false);
   string n1("node");
   while(1) {
@@ -46,12 +48,9 @@ void e(){
 }
 
 
-
-
-
 void example(){
-  string source_id("C++_netstream_test");
-  long time_id=0L;
+  string source_id("C");
+  GS_LONG time_id = 127L;
   NetStreamSender stream("default","localhost",2001,false);
   string style("node{fill-mode:plain;fill-color:#567;size:6px;}");
   stream.addGraphAttribute(source_id, time_id++, "stylesheet", style);
@@ -62,39 +61,35 @@ void example(){
   for (int i = 0; i < 500; i++) {
     stringstream n1;
     n1<<i;
-  stream.addNode(source_id, time_id++, n1.str());
-  if (i > 0) {
-    
-    
-    stringstream n2;
-    n2<<(i-1);
-    
-    stringstream n3;
-    n3<<(i/2);
-    
-    stringstream e1;
-    e1<<n1.str()<<"-"<<n2.str();
-    stringstream e2;
-    e2<<n1.str()<<"-"<<n3.str();
-    //cout<<"edge :"<<e1.str()<<endl;
-    stream.addEdge(source_id, time_id++, e1.str(), n1.str(), n2.str(), false);
-    stream.addEdge(source_id, time_id++, e2.str(), n1.str(), n3.str(), false);
-  }
+    stream.addNode(source_id, time_id++, n1.str());
+    if (i > 0) {
+      stringstream n2;
+      n2<<(i-1);
+      stringstream n3;
+      n3<<(i/2);
+      stringstream e1;
+      e1<<n1.str()<<"-"<<n2.str();
+      stringstream e2;
+      e2<<n1.str()<<"-"<<n3.str();
+      //cout<<"edge :"<<e1.str()<<endl;
+      stream.addEdge(source_id, time_id++, e1.str(), n1.str(), n2.str(), false);
+      stream.addEdge(source_id, time_id++, e2.str(), n1.str(), n3.str(), false);
+    }
   }
 }
 
 void types_test(){
   string source_id="C++_netstream_test";
-  long time_id=0L;
+  GS_LONG time_id=0L;
   NetStreamSender stream("default","localhost",2001,true);
   
   
-  stream.addGraphAttribute(source_id, time_id++, "int", 1);
-  stream.addGraphAttribute(source_id, time_id++, "float", (float)1);
-  stream.addGraphAttribute(source_id, time_id++, "double", 1.0);
-  stream.addGraphAttribute(source_id, time_id++, "long", 1L);
-  stream.addGraphAttribute(source_id, time_id++, "byte", (char) 0);
-  stream.addGraphAttribute(source_id, time_id++, "boolean", true);
+  stream.addGraphAttribute(source_id, time_id++, "int", (GS_INT)1);
+  stream.addGraphAttribute(source_id, time_id++, "float", (GS_FLOAT)1);
+  stream.addGraphAttribute(source_id, time_id++, "double", (GS_DOUBLE)1.0);
+  stream.addGraphAttribute(source_id, time_id++, "long", (GS_LONG)1);
+  stream.addGraphAttribute(source_id, time_id++, "byte", (GS_CHAR)0);
+  stream.addGraphAttribute(source_id, time_id++, "boolean", (GS_BOOL)true);
 
   int v[] = {1776,7,4};
   vector<int> value(v,v+3);
@@ -108,12 +103,12 @@ void types_test(){
   vector<double> value3(v3,v3+2);
   stream.addGraphAttribute(source_id, time_id++, "doubleArray", value3);
   
-  long int v4[] = {1776,7,4};
-  vector<long int> value4(v4,v4+3);
+  GS_LONG v4[] = {1776,7,4};
+  vector<GS_LONG> value4(v4,v4+3);
   stream.addGraphAttribute(source_id, time_id++, "longArray", value4);
 
-  char v5[] = {'0',(char)0,'z'};
-  vector<char> value5(v5,v5+3);
+  GS_CHAR v5[] = {'0',(GS_CHAR)0,'z'};
+  vector<GS_CHAR> value5(v5,v5+3);
   stream.addGraphAttribute(source_id, time_id++, "byteArray",value5 );
 
   bool v6[] = {true,false};
@@ -125,7 +120,7 @@ void types_test(){
 
 void events_test(){
   string source_id="C++_netstream_test";
-  long time_id=0L;
+  GS_LONG time_id=0L;
   NetStreamSender stream("localhost", 2001);
   stream.addNode(source_id, time_id++, "node0");
   stream.addEdge(source_id, time_id++, "edge", "node0", "node1", true);

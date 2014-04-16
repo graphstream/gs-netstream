@@ -18,6 +18,13 @@ CDBG = -g $(CWARN) -fno-inline
 CFLAGS = -I$(INCDIR) -O3 
 DFLAGS = -I$(INCDIR) -g $(CWARN) -fno-inline -DDEBUG=1
 
+ifeq ($(shell uname),MINGW32_NT-6.1)
+	SOCKET_LIB = -lwsock32
+else
+	SOCKET_LIB = 
+endif
+
+
 CTAG = ctags
 CTAGFILE = filelist
 # src, object and bin files
@@ -38,14 +45,14 @@ OBJS = \
 all: $(OUT_BINARY) $(OUT_LIBRARY)
 
 $(OUT_BINARY): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(OUT_BINARY)
+	$(CC) $(CFLAGS) $(OBJS) -o $(OUT_BINARY) $(SOCKET_LIB)
 
 $(OUT_LIBRARY): $(OBJS)
 	$(AR) $(ARFLAGS) $(OUT_LIBRARY)  $(OBJS) 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	mkdir -p $(OBJDIR)
-	$(CC) $(CFLAGS) -c $? -o $@ 
+	$(CC) $(CFLAGS) -c $? -o $@
 
 .PHONY: clean depend fresh
 

@@ -15,7 +15,7 @@
 
 
 
-#ifndef WIN32
+#if !defined(WIN32) || !defined(__MINGW32__)
 	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>
@@ -31,9 +31,11 @@
 
 	#include <winsock2.h>
 
+#if !defined(__MINGW32__)
 	#ifndef vsnprintf
 		#define vsnprintf _vsnprintf
 	#endif
+#endif
 
 #endif
 
@@ -379,6 +381,7 @@ namespace netstream
 				cerr << " " << (int)b[i] << " ";
 			}
 			cerr << "]" << endl;
+			cerr.flush();
 		}
 
 		unsigned char const *buf_ptr = buf;
