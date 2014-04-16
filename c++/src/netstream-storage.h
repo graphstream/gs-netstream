@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include "netstream-sizes.h"
 
 namespace netstream
 {
@@ -69,8 +70,8 @@ public:
 	virtual unsigned char readChar() throw(std::invalid_argument);
 	virtual void writeChar(unsigned char) throw();
 
-	virtual int readByte() throw(std::invalid_argument);
-	virtual void writeByte(int) throw(std::invalid_argument);
+	virtual GS_INT readByte() throw(std::invalid_argument);
+	virtual void writeByte(GS_INT) throw(std::invalid_argument);
 //	virtual void writeByte(unsigned char) throw();
 
 	virtual int readUnsignedByte() throw(std::invalid_argument);
@@ -82,26 +83,29 @@ public:
 	virtual std::vector<std::string> readStringList() throw(std::invalid_argument);
 	virtual void writeStringList(const std::vector<std::string> &s) throw();
 
-	virtual int readShort() throw(std::invalid_argument);
-	virtual void writeShort(int) throw(std::invalid_argument);
+	virtual GS_INT readShort() throw(std::invalid_argument);
+	virtual void writeShort(GS_INT) throw(std::invalid_argument);
 
-	virtual int readInt() throw(std::invalid_argument);
-	virtual void writeInt(int) throw();
+	virtual GS_INT readInt() throw(std::invalid_argument);
+	virtual void writeInt(GS_INT) throw();
 
-	virtual long readLong() throw(std::invalid_argument);
-	virtual void writeLong(long) throw();
+	GS_INT varintSize(GS_LONG data);
+	virtual void writeUnsignedVarInt(GS_LONG data) throw();
 
-	virtual float readFloat() throw(std::invalid_argument);
-	virtual void writeFloat( float ) throw();
+	virtual GS_LONG readLong() throw(std::invalid_argument);
+	virtual void writeLong(GS_LONG) throw();
 
-	virtual double readDouble() throw(std::invalid_argument);
-	virtual void writeDouble( double ) throw();
+	virtual GS_FLOAT readFloat() throw(std::invalid_argument);
+	virtual void writeFloat( GS_FLOAT ) throw();
+
+	virtual GS_DOUBLE readDouble() throw(std::invalid_argument);
+	virtual void writeDouble( GS_DOUBLE ) throw();
 
 	virtual void writePacket(unsigned char* packet, int length);
 
 	virtual void writeStorage(netstream::NetStreamStorage& store);
 
-  virtual NetStreamStorage operator+(const NetStreamStorage & storage);
+    virtual NetStreamStorage operator+(const NetStreamStorage & storage);
 
   
 	// Some enabled functions of the underlying std::list
