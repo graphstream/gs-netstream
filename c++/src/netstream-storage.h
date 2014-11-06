@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <cstdint>
 
 namespace netstream
 {
@@ -65,6 +66,13 @@ public:
 	virtual unsigned int position() const;
 
 	void reset();
+
+	virtual size_t varintSize(uint_fast64_t);
+	virtual uint_fast64_t readUnsignedVarint() throw(std::invalid_argument);
+	virtual void writeUnsignedVarint(uint_fast64_t) throw(std::invalid_argument);
+
+	virtual int_fast64_t readVarint() throw(std::invalid_argument);
+	virtual void writeVarint(int_fast64_t) throw(std::invalid_argument);
 
 	virtual unsigned char readChar() throw(std::invalid_argument);
 	virtual void writeChar(unsigned char) throw();

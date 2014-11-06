@@ -36,9 +36,6 @@ namespace netstream
 	// ----------------------------------------------------------------------
 	NetStreamStorage::NetStreamStorage(unsigned char packet[], int length)
 	{
-		// Length is calculated, if -1, or given
-		if (length == -1) length = sizeof(packet) / sizeof(unsigned char);
-
 		store.reserve(length);
 		// Get the content
 		for(int i = 0; i < length; ++i) store.push_back(packet[i]);
@@ -111,6 +108,75 @@ namespace netstream
 	{
 		store.push_back(value);
 		iter_ = store.begin();
+	}
+
+
+
+	size_t NetStreamStorage::varintSize(uint_fast64_t data){
+		// 7 bits -> 127
+		if(data < (1L << 7)){return 1;}
+		// 14 bits -> 16383
+		if(data < (1L << 14)){return 2;}
+		// 21 bits -> 2097151
+		if(data < (1L << 21)){return 3;}
+		// 28 bits -> 268435455
+		if(data < (1L << 28)){return 4;}
+		// 35 bits -> 34359738367
+		if(data < (1L << 35)){return 5;}
+		// 42 bits -> 4398046511103
+		if(data < (1L << 42)){return 6;}
+		// 49 bits -> 562949953421311
+		if(data < (1L << 49)){return 7;}
+		// 56 bits -> 72057594037927935
+		if(data < (1L << 56)){return 8;}	
+		return 9;
+	}
+
+
+	// ----------------------------------------------------------------------
+	/**
+	* Reads a varint form the array
+	* @return The read varint 
+	*/
+	int_fast64_t NetStreamStorage::readVarint()	throw(std::invalid_argument)
+	{
+		uint_fast64_t number = readUnsignedVarint();
+		return (int_fast64_t)((number & 1) == 0) ? number >> 1 : -(number >> 1);
+	}
+	// ----------------------------------------------------------------------
+	/**
+	*
+	*/
+	void NetStreamStorage::writeVarint(int_fast64_t value) throw(std::invalid_argument)
+	{
+		writeUnsignedVarint((value << 1) ^ (value >> 63));
+	}
+	// ----------------------------------------------------------------------
+	/**
+	* Reads a unsigned varint form the array
+	* @return The read u_varint 
+	*/
+	uint_fast64_t NetStreamStorage::readUnsignedVarint()	throw(std::invalid_argument)
+	{
+		// TODO
+		return 0;
+	}
+	// ----------------------------------------------------------------------
+	/**
+	*
+	*/
+	void NetStreamStorage::writeUnsignedVarint(uint_fast64_t value) throw(std::invalid_argument)
+	{
+		size_t size = varintSize(value);
+		
+		unsigned char buffer[size];
+		for(int i = 0; i < size; i++){
+			int head=128;
+			if(i==size-1) head = 0;
+			long b = ((value >> (7*i)) & 127) ^ head;
+			buffer[size-1-i] = ((unsigned char)(b & 255 ));
+		}
+		writeByEndianess(buffer, size);
 	}
 
 
@@ -190,8 +256,7 @@ namespace netstream
 	*/
 	void NetStreamStorage::writeString(const std::string &s) throw()
 	{
-		writeInt(static_cast<int>(s.length()));
-
+		writeUnsignedVarint(static_cast<size_t>(s.length()));
 		store.insert(store.end(), s.begin(), s.end());
 		iter_ = store.begin();
 	}
@@ -222,7 +287,7 @@ namespace netstream
 	*/
 	void NetStreamStorage::writeStringList(const std::vector<std::string> &s) throw()
 	{
-		writeInt(static_cast<int>(s.size()));
+		writeUnsignedVarint(s.size());
         for (std::vector<std::string>::const_iterator it = s.begin(); it!=s.end() ; it++) 
 		{
 			writeString(*it);
@@ -258,6 +323,7 @@ namespace netstream
 		short svalue = static_cast<short>(value);
 		unsigned char *p_svalue = reinterpret_cast<unsigned char*>(&svalue);
 		writeByEndianess(p_svalue, 2);
+		
 	}
 
 

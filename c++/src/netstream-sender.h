@@ -13,10 +13,17 @@
 #ifndef NETSTREAM_SENDER_H
 #define NETSTREAM_SENDER_H
 
-#include <iostream>
 
-#include <sys/socket.h>
-#include <errno.h>
+
+
+#ifndef WIN32
+  #include <unistd.h>
+#else
+  #include <windows.h>
+#endif
+
+
+#include <iostream>
 
 #include "netstream-storage.h"
 #include "netstream-socket.h"
@@ -117,7 +124,7 @@ public:
     NetStreamStorage event = NetStreamStorage();
     event.writeByte(netstream::EVENT_ADD_GRAPH_ATTR);
     event.writeString(source_id);
-    event.writeLong(time_id);
+    event.writeUnsignedVarint(time_id);
     event.writeString(attribute);
     event.writeByte(getType(value));
     encode(event, value);
@@ -129,7 +136,7 @@ public:
      NetStreamStorage event = NetStreamStorage();
      event.writeByte(EVENT_CHG_GRAPH_ATTR);
      event.writeString(source_id);
-     event.writeLong(time_id);
+     event.writeUnsignedVarint(time_id);
      event.writeString(attribute);
      event.writeByte(getType(oldValue));
      encode(event, oldValue);
@@ -145,7 +152,7 @@ public:
     NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_ADD_NODE_ATTR);
     event.writeString(source_id);
-    event.writeLong(time_id);
+    event.writeUnsignedVarint(time_id);
     event.writeString(node_id);
     event.writeString(attribute);
     event.writeByte(getType(value));
@@ -158,7 +165,7 @@ public:
     NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_CHG_NODE_ATTR);
     event.writeString(source_id);
-    event.writeLong(time_id);
+    event.writeUnsignedVarint(time_id);
     event.writeString(node_id);
     event.writeString(attribute);
     event.writeByte(getType(oldValue));
@@ -175,7 +182,7 @@ public:
     NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_ADD_EDGE_ATTR);
     event.writeString(source_id);
-    event.writeLong(time_id);
+    event.writeUnsignedVarint(time_id);
     event.writeString(edge_id);
     event.writeString(attribute);
     event.writeByte(getType(value));
@@ -189,7 +196,7 @@ public:
     NetStreamStorage event = NetStreamStorage();
     event.writeByte(EVENT_CHG_EDGE_ATTR);
     event.writeString(source_id);
-    event.writeLong(time_id);
+    event.writeUnsignedVarint(time_id);
     event.writeString(edge_id);
     event.writeString(attribute);
     event.writeByte(getType(oldValue));
