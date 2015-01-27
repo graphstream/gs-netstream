@@ -1,18 +1,19 @@
-from gs_netstream.sender import  NetStreamProxyGraph, NetStreamSender, Base64NetStreamTransport
+import logging
+from gs_netstream.sender import  NetStreamProxyGraph, NetStreamSender
 
-transport = Base64NetStreamTransport("default","localhost",2001)
-sender = NetStreamSender(transport)
+logging.basicConfig(level=logging.DEBUG)
+
+sender = NetStreamSender(2012)
 proxy = NetStreamProxyGraph(sender)
 
 style = "node{fill-mode:plain;fill-color:gray;size:1px;}"
-proxy.addAttribute("stylesheet", style)
+proxy.add_attribute("stylesheet", style)
 
-proxy.addAttribute("ui.antialias", True)
-proxy.addAttribute("layout.stabilization-limit", 0)
+proxy.add_attribute("ui.antialias", True)
+proxy.add_attribute("layout.stabilization-limit", 0)
 
 for i in range(0,500):
- proxy.addNode(str(i))
- if(i>0):
-   proxy.addEdge(str(i)+"_"+str(i-1), str(i), str(i-1),False)
-   proxy.addEdge(str(i)+"__"+str(i/2), str(i), str(i/2), False)
-   
+    proxy.add_node(str(i))
+    if i > 0:
+        proxy.add_edge(str(i) + "_" + str(i-1), str(i), str(i-1), False)
+        proxy.add_edge(str(i) + "__" + str(i/2), str(i), str(i/2), False)
