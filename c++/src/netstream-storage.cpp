@@ -34,7 +34,7 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	NetStreamStorage::NetStreamStorage(unsigned char packet[], int length)
+	NetStreamStorage::NetStreamStorage(unsigned char *packet, int length)
 	{
 		store.reserve(length);
 		// Get the content

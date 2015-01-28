@@ -56,8 +56,8 @@ public:
 	/// Standard Constructor
 	NetStreamStorage();
 
-	/// Constructor, that fills the storage with an char array. If length is -1, the whole array is handed over
-	NetStreamStorage(unsigned char[], int length=-1);
+	/// Constructor, that fills the storage with an char array.
+	NetStreamStorage(unsigned char *, int length);
 
 	// Destructor
 	virtual ~NetStreamStorage();
