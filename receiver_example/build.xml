@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="jar" name="gs-netstream">
+	 <property name="bindir" value="bin/"/>
+	 <property name="srcdir" value="src/"/>
+	
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.5"/>
+    <property name="source" value="1.5"/>
+    <path id="this.classpath">
+        <pathelement location="${bindir}"/>
+    </path>
+    <target name="init">
+        <mkdir dir="${bindir}"/>
+        <copy todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="${bindir}"/>
+		  <delete file="${ant.project.name}.jar"/>
+			
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build" name="jar">
+		 <jar jarfile="${ant.project.name}.jar" basedir="${bindir}"/>
+	 </target>
+	
+    <target depends="init" name="build">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${bindir}" source="${source}" target="${target}">
+            <src path="${srcdir}"/>
+            <classpath refid="this.classpath"/>
+        </javac>
+    </target>
+
+</project>
