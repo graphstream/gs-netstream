@@ -261,25 +261,32 @@ namespace Netstream
 
         private void Serialize(object input)
         {
-            byte[] bytes;
+            byte[] bytes = null;
 
+            // Bitconvert normal types:
             if (input is bool)
                 bytes = BitConverter.GetBytes((bool) input);
-            else if (input is byte || input is char)
-                bytes = new byte[] { Convert.ToByte(input) };
-            else if (input is short || input is int || input is long)
-                bytes = GetVarint(Convert.ToInt64(input));
-            else if (input is ushort || input is uint || input is ulong)
-                bytes = GetUnsignedVarint(Convert.ToInt64(input));
             else if (input is float)
                 bytes = BitConverter.GetBytes((float) input);
             else if (input is double)
                 bytes = BitConverter.GetBytes((double) input);
+
+            if (bytes != null)
+            {
+                // Make big endian if bit converted:
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(bytes);
+            }
+            // Handle all other types:
+            else if (input is byte || input is char)
+                bytes = new byte[] {Convert.ToByte(input)};
+            else if (input is short || input is int || input is long)
+                bytes = GetVarint(Convert.ToInt64(input));
+            else if (input is ushort || input is uint || input is ulong)
+                bytes = GetUnsignedVarint(Convert.ToInt64(input));
             else
                 throw new ArgumentException();
 
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(bytes);
             Write(bytes, 0, bytes.Length);
         }
     }

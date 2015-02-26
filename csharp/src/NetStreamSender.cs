@@ -52,7 +52,7 @@ namespace Netstream
         private readonly byte[] _streamIdArray;
         private readonly String _host;
         private readonly int _port;
-        private Socket _socket;
+        private TcpClient _client;
         private BufferedStream _outStream;
         private NetStreamPacker _packer = new DefaultPacker();
 
@@ -120,9 +120,8 @@ namespace Netstream
 
         protected void Connect()
         {
-            _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            _socket.Connect(new DnsEndPoint(_host, _port));
-            _outStream = new BufferedStream(new NetworkStream(_socket));
+            _client = new TcpClient(_host, _port);
+            _outStream = new BufferedStream(_client.GetStream());
         }
 
         /**
@@ -131,7 +130,7 @@ namespace Netstream
 
         private void DoSend(NetStreamStorage buff)
         {
-            if (!_socket.Connected)
+            if (!_client.Connected)
             {
                 Console.Error.WriteLine("NetStreamSender : can't send. The socket is closed.");
             }
@@ -156,43 +155,6 @@ namespace Netstream
             }
         }
 
-        protected void AddAttribute(String sourceId, ulong timeId, String attribute, Object value, NetStreamEvent e)
-        {
-            NetStreamStorage buff = new NetStreamStorage().
-                EncodeArray(_streamIdArray).
-                EncodeEvent(e).
-                EncodeString(sourceId).
-                EncodeNative(timeId).
-                EncodeString(attribute).
-                EncodeValueWithType(value);
-            DoSend(buff);
-        }
-
-        protected void ChangeAttribute(String sourceId, ulong timeId, String attribute, Object oldValue, Object newValue,
-            NetStreamEvent e)
-        {
-            NetStreamStorage buff = new NetStreamStorage().
-                EncodeArray(_streamIdArray).
-                EncodeEvent(e).
-                EncodeString(sourceId).
-                EncodeNative(timeId).
-                EncodeString(attribute).
-                EncodeValueWithType(oldValue).
-                EncodeValueWithType(newValue);
-            DoSend(buff);
-        }
-
-        protected void RemoveAttribute(String sourceId, ulong timeId, String attribute, NetStreamEvent e)
-        {
-            NetStreamStorage buff = new NetStreamStorage().
-                EncodeArray(_streamIdArray).
-                EncodeEvent(e).
-                EncodeString(sourceId).
-                EncodeNative(timeId).
-                EncodeString(attribute);
-            DoSend(buff);
-        }
-
         /*
          * (non-Javadoc)
          * 
@@ -202,7 +164,14 @@ namespace Netstream
          */
         public void AddGraphAttribute(String sourceId, ulong timeId, String attribute, Object value)
         {
-            AddAttribute(sourceId, timeId, attribute, value, NetStreamEvent.AddGraphAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.AddGraphAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(attribute).
+                EncodeValueWithType(value);
+            DoSend(buff);
         }
 
         /*
@@ -215,7 +184,15 @@ namespace Netstream
         public void ChangeGraphAttribute(String sourceId, ulong timeId, String attribute, Object oldValue,
             Object newValue)
         {
-            ChangeAttribute(sourceId, timeId, attribute, oldValue, newValue, NetStreamEvent.ChgGraphAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.ChgGraphAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(attribute).
+                EncodeValueWithType(oldValue).
+                EncodeValueWithType(newValue);
+            DoSend(buff);
         }
 
         /*
@@ -227,7 +204,13 @@ namespace Netstream
          */
         public void RemoveGraphAttribute(String sourceId, ulong timeId, String attribute)
         {
-            RemoveAttribute(sourceId, timeId, attribute, NetStreamEvent.DelGraphAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.DelGraphAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(attribute);
+            DoSend(buff);
         }
 
         /*
@@ -240,7 +223,15 @@ namespace Netstream
         public void AddNodeAttribute(String sourceId, ulong timeId, String nodeId,
             String attribute, Object value)
         {
-            AddAttribute(sourceId, timeId, attribute, value, NetStreamEvent.AddNodeAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.AddNodeAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(nodeId).
+                EncodeString(attribute).
+                EncodeValueWithType(value);
+            DoSend(buff);
         }
 
         /*
@@ -254,7 +245,16 @@ namespace Netstream
         public void ChangeNodeAttribute(String sourceId, ulong timeId,
             String nodeId, String attribute, Object oldValue, Object newValue)
         {
-            ChangeAttribute(sourceId, timeId, attribute, oldValue, newValue, NetStreamEvent.ChgNodeAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.ChgNodeAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(nodeId).
+                EncodeString(attribute).
+                EncodeValueWithType(oldValue).
+                EncodeValueWithType(newValue);
+            DoSend(buff);
         }
 
         /*
@@ -267,7 +267,14 @@ namespace Netstream
         public void RemoveNodeAttribute(String sourceId, ulong timeId,
             String nodeId, String attribute)
         {
-            RemoveAttribute(sourceId, timeId, attribute, NetStreamEvent.DelNodeAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.DelNodeAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(nodeId).
+                EncodeString(attribute);
+            DoSend(buff);
         }
 
         /*
@@ -280,7 +287,15 @@ namespace Netstream
         public void AddEdgeAttribute(String sourceId, ulong timeId, String edgeId,
             String attribute, Object value)
         {
-            AddAttribute(sourceId, timeId, attribute, value, NetStreamEvent.AddEdgeAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.AddEdgeAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(edgeId).
+                EncodeString(attribute).
+                EncodeValueWithType(value);
+            DoSend(buff);
         }
 
         /*
@@ -294,7 +309,16 @@ namespace Netstream
         public void ChangeEdgeAttribute(String sourceId, ulong timeId,
             String edgeId, String attribute, Object oldValue, Object newValue)
         {
-            ChangeAttribute(sourceId, timeId, attribute, oldValue, newValue, NetStreamEvent.ChgEdgeAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.ChgEdgeAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(edgeId).
+                EncodeString(attribute).
+                EncodeValueWithType(oldValue).
+                EncodeValueWithType(newValue);
+            DoSend(buff);
         }
 
         /*
@@ -307,7 +331,14 @@ namespace Netstream
         public void RemoveEdgeAttribute(String sourceId, ulong timeId,
             String edgeId, String attribute)
         {
-            RemoveAttribute(sourceId, timeId, attribute, NetStreamEvent.DelEdgeAttr);
+            NetStreamStorage buff = new NetStreamStorage().
+                EncodeArray(_streamIdArray).
+                EncodeEvent(NetStreamEvent.DelEdgeAttr).
+                EncodeString(sourceId).
+                EncodeNative(timeId).
+                EncodeString(edgeId).
+                EncodeString(attribute);
+            DoSend(buff);
         }
 
         /*
@@ -422,7 +453,7 @@ namespace Netstream
          */
         public void Close()
         {
-            _socket.Close();
+            _client.Close();
         }
     }
 }

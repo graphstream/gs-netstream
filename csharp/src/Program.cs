@@ -39,7 +39,10 @@
  * @author Benjamin Krämer <benjamin.kraemer@in.tum.de>
  *
  */
+
+using System;
 using System.Text;
+using System.Threading;
 
 namespace Netstream
 {
@@ -49,8 +52,8 @@ namespace Netstream
         {
             //Endless();
             //EventsTest();
-            TypesTest();
-            //Example();
+            //TypesTest();
+            Example();
         }
 
         private static void Endless()
@@ -59,10 +62,11 @@ namespace Netstream
             ulong timeId = 0L;
             var stream = new NetStreamSender("default", "localhost", 2001);
             const string n1 = "node";
-            while (true)
+            while (timeId < 1000)
             {
-                stream.AddNode(sourceId, timeId++, n1);
+                stream.AddNode(sourceId, timeId++, n1 + timeId);
             }
+            stream.Close();
         }
 
         private static void Example()
@@ -70,35 +74,71 @@ namespace Netstream
             const string sourceId = "C++_netstream_test";
             ulong timeId = 0L;
             var stream = new NetStreamSender("default", "localhost", 2001);
-            const string style = "node{fill-mode:plain;fill-color:#567;size:6px;}";
+            const string style = "node {" +
+                " shape: rounded-box;" +
+                " fill-color: grey;" +
+                " fill-mode: dyn-plain;" +
+                " size-mode: fit;" +
+                "}" +
+                "node.active {" +
+                " fill-color: green;" +
+                " size:20px;" +
+                "}" +
+                "edge {" +
+                " shape: cubic-curve;" +
+                " size: 1px;" +
+                " arrow-shape: arrow;" +
+                "}" +
+                "edge.active {" +
+                " fill-color: green;" +
+                " size: 5px;" +
+                "}";
             stream.AddGraphAttribute(sourceId, timeId++, "stylesheet", style);
-            stream.AddGraphAttribute(sourceId, timeId++, "test", "test");
-            stream.ChangeGraphAttribute(sourceId, timeId++, "test", "test", false);
             stream.AddGraphAttribute(sourceId, timeId++, "ui.antialias", true);
+            stream.AddGraphAttribute(sourceId, timeId++, "ui.quality", true);
             stream.AddGraphAttribute(sourceId, timeId++, "layout.stabilization-limit", 0);
             for (int i = 0; i < 500; i++)
             {
-                var n1 = new StringBuilder();
-                n1.Append(i);
-                stream.AddNode(sourceId, timeId++, n1.ToString());
+                var n1 = i.ToString();
+                AddNodeWithLabel(stream, sourceId, ref timeId, n1);
                 if (i > 0)
                 {
-                    var n2 = new StringBuilder();
-                    n2.Append(i - 1);
+                    var n2 = (i - 1).ToString();
+                    var n3 = (i/2).ToString();
+                    var e1 = n1 + "-" + n2;
+                    var e2 = n1 + "-" + n3;
 
-                    var n3 = new StringBuilder();
-                    n3.Append(i/2);
+                    AddEdgeWithLabel(stream, sourceId, ref timeId, e1, n1, n2);
 
-                    var e1 = new StringBuilder();
-                    e1.Append(n1).Append("-").Append(n2);
-
-                    var e2 = new StringBuilder();
-                    e2.Append(n1).Append("-").Append(n3);
-
-                    stream.AddEdge(sourceId, timeId++, e1.ToString(), n1.ToString(), n2.ToString(), false);
-                    stream.AddEdge(sourceId, timeId++, e2.ToString(), n1.ToString(), n3.ToString(), false);
+                    if (!e1.Equals(e2))
+                        AddEdgeWithLabel(stream, sourceId, ref timeId, e2, n1, n3);
                 }
+                //Thread.Sleep(100);
             }
+            stream.Close();
+        }
+
+        private static String lastEdge, lastNode;
+        private static void AddEdgeWithLabel(NetStreamSender stream, string sourceId, ref ulong timeId, string name, string nodeFrom, string nodeTo)
+        {
+            if (lastEdge != null)
+                stream.RemoveEdgeAttribute(sourceId, timeId++, lastEdge, "ui.class");
+
+            stream.AddEdge(sourceId, timeId++, name, nodeFrom, nodeTo, false);
+            stream.AddEdgeAttribute(sourceId, timeId++, name, "ui.label", name);
+            stream.AddEdgeAttribute(sourceId, timeId++, name, "ui.class", "active");
+            lastEdge = name;
+        }
+
+        private static void AddNodeWithLabel(NetStreamSender stream, string sourceId, ref ulong timeId, string name)
+        {
+            if (lastNode != null)
+                stream.RemoveNodeAttribute(sourceId, timeId++, lastNode, "ui.class");
+
+            stream.AddNode(sourceId, timeId++, name);
+            stream.AddNodeAttribute(sourceId, timeId++, name, "ui.label", name);
+            stream.AddNodeAttribute(sourceId, timeId++, name, "ui.class", "active");
+            lastNode = name;
         }
 
         private static void TypesTest()
@@ -133,6 +173,7 @@ namespace Netstream
             stream.AddGraphAttribute(sourceId, timeId++, "booleanArray", v6);
 
             stream.AddGraphAttribute(sourceId, timeId++, "string", "true");
+            stream.Close();
         }
 
         private static void EventsTest()
@@ -155,6 +196,7 @@ namespace Netstream
             stream.RemoveEdge(sourceId, timeId++, "edge");
             stream.RemoveNode(sourceId, timeId++, "node0");
             stream.GraphClear(sourceId, timeId++);
+            stream.Close();
         }
     }
 }

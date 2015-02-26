@@ -1,0 +1,43 @@
+# VS2013 User-specific files #
+##############################
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS2013 Build results #
+########################
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Intellij stuff #
+##################
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Build and unit tests stuff #
+#############################
+logs/
+target/
+out/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.next
+release.properties
+work/
+amps-standalone/
+*/dependency-reduced-pom.xml
+
+# Mac stuff #
+#############
+.DS_Store
