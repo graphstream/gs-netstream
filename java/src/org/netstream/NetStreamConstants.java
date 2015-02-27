@@ -715,6 +715,8 @@ public class NetStreamConstants {
 
 	// Values types
 
+	public static int TYPE_UNKNOWN = 0x00;
+
 	/**
 	 * Followed by a byte who's value is 0 or 1
 	 */
@@ -796,6 +798,8 @@ public class NetStreamConstants {
 	 * elements themselves have to give their type.
 	 */
 	public static byte TYPE_ARRAY = 0x60;
+
+	public static int TYPE_NULL = 0x61;
 	
 	
 	
