@@ -29,7 +29,6 @@
     };
 
     global.netstream.DOMSink.prototype = {
-        element: "",
         appendMsg: function (msg) {
             var textNode = global.document.createTextNode(msg);
             var parNode = global.document.createElement('p');
@@ -139,7 +138,7 @@
 
 
     global.netstream.Receiver = function (options) {
-        
+
         // --------- parameters
         this.sink = null;
         this.transport = null;
@@ -152,28 +151,26 @@
             this[prop] = options[prop];
           }
         }
-        
+
         // wrapping this
         var gs = this;
 
         this.sink = this.sink || new netstream.DefaultGSSink();
-        
+
         // link with the transport layer
         this.transport = this.transport || new netstream.Transport(options);
-        
+
         this.transport.onevent = function (e){
           gs.receiveEvent(e);
         };
-        
+
         this.transport.connect();
-        
-    }
+
+    };
 
     global.netstream.Receiver.prototype = {
 
         receiveEvent: function (msg) {
-            //netstream.LOGGER(this.beg + " " + this.end);
-            ////////var msg = new DataView(netstream.base64.decode(new Uint8Array(this.buffer, this.beg, this.end - this.beg)).buffer);
             var msgIndex = 0;
 
             // get the Stream name
@@ -282,14 +279,61 @@
         },
 
 
+        readUnsignedVarint: function( msg, msgIndex) {
+            try {
+
+                var size = 0,
+                    data = [],
+                    i = 0;
+
+                do {
+                    data[size] = msg.getInt8(msgIndex);
+                    msgIndex += 1; // One Byte at a time
+                    size++;
+
+                    //int bt =data[size-1];
+                    //if (bt < 0) bt = (bt & 127) + (bt & 128);
+                    //System.out.println("test "+bt+"  -> "+(data[size - 1]& 128) );
+                } while ((data[size - 1] & 128) == 128);
+                var number = 0;
+                for (i = 0; i < size; i++) {
+
+                    number ^= (data[i] & 127) << (i * 7);
+
+                }
+
+                return {
+                    "data": number,
+                    "index": msgIndex
+                };
+
+            } catch (e) {
+                throw 'readUnsignedVarintFromInteger: could not read';
+            }
+        },
+
+
+
+        readVarint: function (msg, msgIndex) {
+            var number = this.readUnsignedVarint(msg, msgIndex);
+            return {
+                "data": ((number.data & 1) == 0) ? number.data >> 1 : -(number.data >> 1),
+                "index": number.index
+            };
+        },
+
+
+
+
         readArray: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
+
             var data = [];
-            var res;
             for (var i = 0; i < len; i++) {
                 res = this.readValue(msg, msgIndex + 1, this.readType(msg, msgIndex));
-                msgIndex = rex.index;
+                msgIndex = res.index;
                 data[i] = res.data;
             }
             return {
@@ -299,8 +343,9 @@
         },
 
         readString: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
 
             var data = netstream.typedArrayToString(new Uint8Array(msg.buffer, msg.byteOffset + msgIndex, len));
             msgIndex += len;
@@ -328,31 +373,15 @@
         },
 
         readShort: function (msg, msgIndex) {
-            var data = msg.getInt16(msgIndex);
-            return {
-                "data": data,
-                "index": msgIndex + 2
-            };
+            return this.readVarint(msg, msgIndex);
         },
 
         readInt: function (msg, msgIndex) {
-            var data = msg.getInt32(msgIndex);
-            return {
-                "data": data,
-                "index": msgIndex + 4
-            };
+            return this.readVarint(msg, msgIndex);
         },
 
         readLong: function (msg, msgIndex) {
-            var head = msg.getInt32(msgIndex);
-            if (head !== 0) {
-                netstream.LOGGER("(netstream.Receiver.readLong) : Read long does not fit in a 32bits int... Big problem !!!!");
-            }
-            var data = msg.getInt32(msgIndex + 4);
-            return {
-                "data": data,
-                "index": msgIndex + 8
-            };
+            return this.readVarint(msg, msgIndex);
         },
 
         readFloat: function (msg, msgIndex) {
@@ -372,13 +401,15 @@
         },
 
         readIntArray: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
 
             var data = [];
             for (var i = 0; i < len; i++) {
-                data[i] = msg.getInt32(msgIndex);
-                msgIndex += 4;
+                res = this.readVarint(msg, msgIndex);
+                data[i] = res.data;
+                msgIndex  = res.index;
             }
             return {
                 "data": data,
@@ -387,8 +418,9 @@
         },
 
         readBooleanArray: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
 
             var data = [];
             for (var i = 0; i < len; i++) {
@@ -402,8 +434,9 @@
         },
 
         readByteArray: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
 
             var data = [];
             for (var i = 0; i < len; i++) {
@@ -416,8 +449,9 @@
         },
 
         readDoubleArray: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
 
             var data = [];
             for (var i = 0; i < len; i++) {
@@ -431,8 +465,9 @@
         },
 
         readFloatArray: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
 
             var data = [];
             for (var i = 0; i < len; i++) {
@@ -446,18 +481,15 @@
         },
 
         readLongArray: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
-            var head;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
+
             var data = [];
             for (var i = 0; i < len; i++) {
-                head = msg.getInt32(msgIndex);
-                msgIndex += 4;
-                if (head !== 0) {
-                    netstream.LOGGER("(netstream.Receiver.readLong) : Read long does not fit in a 32bits int... Big problem !!!!");
-                }
-                data[i] = msg.getInt32(msgIndex);
-                msgIndex += 4;
+                res = this.readVarint(msg, msgIndex);
+                data[i] = res.data
+                msgIndex  = res.index;
             }
             return {
                 "data": data,
@@ -466,13 +498,15 @@
         },
 
         readShortArray: function (msg, msgIndex) {
-            var len = msg.getInt32(msgIndex);
-            msgIndex += 4;
+            var res = this.readUnsignedVarint(msg, msgIndex);
+            var len = res.data;
+            msgIndex = res.index;
 
             var data = [];
             for (var i = 0; i < len; i++) {
-                data[i] = msg.getInt16(msgIndex);
-                msgIndex += 2;
+                res = this.readVarint(msg, msgIndex);
+                data[i] = res.data
+                msgIndex  = res.index;
             }
             return {
                 "data": data,
@@ -487,7 +521,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
             res = this.readString(msg, res.index);
             var edgeId = res.data;
@@ -502,7 +536,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
             res = this.readString(msg, res.index);
             var edgeId = res.data;
@@ -528,7 +562,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -548,7 +582,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -566,7 +600,7 @@
 
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
             res = this.readString(msg, res.index);
             var nodeId = res.data;
@@ -592,7 +626,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -612,7 +646,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -627,7 +661,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -654,7 +688,7 @@
 
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -672,7 +706,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             this.sink.graphCleared(sourceId, timeId);
@@ -684,7 +718,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readDouble(msg, res.index);
@@ -699,7 +733,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -714,7 +748,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -738,7 +772,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);
@@ -753,7 +787,7 @@
             }
             var res = this.readString(msg, msgIndex);
             var sourceId = res.data;
-            res = this.readLong(msg, res.index);
+            res = this.readUnsignedVarint(msg, res.index);
             var timeId = res.data;
 
             res = this.readString(msg, res.index);

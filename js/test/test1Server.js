@@ -1,12 +1,15 @@
 var SERVER_IP = "127.0.0.1";
 
 var http = require('http')
+    , express = require('express')
+    , app = express()
     , fs = require('fs')
     , WebSocketServer = require('ws').Server
     , WebSocket = require('ws')
     , sourceID = "nodeServer"
     , timeID = 0
     , net = require('net')
+    , url = require('url')
     , netstream = {};
 
 netstream.constants = require("../netstream_constants").netstream.constants;
@@ -17,42 +20,26 @@ netstream.constants = require("../netstream_constants").netstream.constants;
 //
 // Classical Http server to serve the files...
 //
-http.createServer(function(request, response) {
-  console.log(request.url);
-  
-    fs.readFile('./' + request.url,
-    function(error, content) {
-      if (error) {
-        response.writeHead(500);
-        response.end();
-        //console.log(error);
-      }
-      else {
-        response.writeHead(200, {
-          'Content-Type': 'text/html'
-        });
-        response.end(content, 'utf-8');
-      }
-    });
-}).listen(8080);
-
-console.log('Http Server running at http://127.0.0.1:8080/');
+app.use(express.static('.'));
+app.use(express.static('../'));
+app.listen(8080, function(){console.log('Http Server running. go to http://127.0.0.1:8080/test1.html')});
 
 
 
 var wss = new WebSocketServer({
   port: 2003,
-  host: SERVER_IP
-});
+  host: SERVER_IP});
+
+
 wss.on('error',
 function() {
   console.log('WS error....');
 });
-wss.on('connection',
-function(ws) {
+wss.on('connection', function(ws) {
 
   console.log("WS Client connected to node");
-
+  var location = url.parse(ws.upgradeReq.url, true);
+  console.log(location);
 
   // create a response server for gs. Random (free) port
   // let's get a graph...
@@ -65,6 +52,7 @@ function(ws) {
     c.on("data",
     function(data) {
       if (ws.readyState === WebSocket.OPEN) {
+        console.log(data);
         ws.send(data);
       }
     });
@@ -103,12 +91,9 @@ function(ws) {
   ws.on('message',
   function(message) {
     //console.log('received: %s', message);
-    // if (message === "Heartbeat"){
-    //             console.log('Heartbeating...');
-    //
-    //         }
+    if (message !== "Heartbeat"){
+              console.log('received: %s', message);
+              ws.send("ok");
+      }
     });
 });
-
-
-

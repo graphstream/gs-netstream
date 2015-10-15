@@ -18,7 +18,7 @@
     this.sender = null;
     this.stream = null;
     this.id = null;
-    
+
     for(var prop in options) {
       if(options.hasOwnProperty(prop) && this.hasOwnProperty(prop)) {
         this[prop] = options[prop];
@@ -30,9 +30,9 @@
     }
     this.id = this.id || "s"+Math.floor(Math.random()*1000);
     this._timeId = 0;
-        
+
   };
-  
+
   global.netstream.Source.prototype = {
     addNode: function (node){
       this.sender.nodeAdded(this.id, this._timeId, node);
@@ -62,7 +62,7 @@
       this.sender.graphAttributeChanged(this.id, this._timeId, attribute, oldValue, newValue);
       this._timeId+=1;
     },
-    
+
     addNodeAttribute: function (node, attribute, value){
       this.sender.nodeAttributeAdded(this.id, this._timeId, node, attribute, value);
       this._timeId+=1;
@@ -75,7 +75,7 @@
       this.sender.nodeAttributeChanged(this.id, this._timeId, node, attribute, oldValue, newValue);
       this._timeId+=1;
     },
-    
+
     addEdgeAttribute: function (edge, attribute, value){
       this.sender.edgeAttributeAdded(this.id, this._timeId, edge, attribute, value);
       this._timeId+=1;
@@ -280,7 +280,7 @@
       this._encodeString(edge_id);
       this._send();
     },
-    
+
     stepBegins: function(source_id, time_id, step) {
       this._encodeString(this.stream);
       this._encodeByte(netstream.constants.EVENT_STEP);
@@ -288,16 +288,16 @@
       this._encodeLong(time_id);
       this._encodeDouble(step);
     },
-    
+
     graphCleared: function(source_id, time_id) {
       this._encodeString(this.stream);
       this._encodeByte(netstream.constants.EVENT_CLEARED);
       this._encodeString(source_id);
       this._encodeLong(time_id);
     },
-    
-    
-    
+
+
+
     // ===============
     // = Private API =
     // ===============
@@ -351,13 +351,11 @@
       if (netstream.constants.TYPE_BOOLEAN === value_type) {
         return this._encodeBoolean(value);
       } else if (netstream.constants.TYPE_BOOLEAN_ARRAY === value_type) {
-        return
-        this._encodeBooleanArray(value);
+        return this._encodeBooleanArray(value);
       } else if (netstream.constants.TYPE_DOUBLE === value_type) {
         return this._encodeDouble(value);
       } else if (netstream.constants.TYPE_DOUBLE_ARRAY === value_type) {
-        return
-        this._encodeDoubleArray(value);
+        return this._encodeDoubleArray(value);
       } else if (netstream.constants.TYPE_STRING === value_type) {
         return this._encodeString(value);
       }
@@ -368,19 +366,100 @@
       var utf8 = netstream.utf16to8(value);
       this._ensureBufferCapacityFor(4 + utf8.length);
 
-      this.view.setInt32(this.pos, utf8.length);
-      this.pos += 4;
+      this._encodeUnsignedVarint(utf8.length);
       for (var i = 0, j = utf8.length; i < j; i++) {
         this.view.setUint8(this.pos++, utf8.charCodeAt(i));
       }
     },
 
+    _varintSize: function(value){
+
+      // value is interpreted as a signed 32 bits integer in JS
+      // value has to be positive.
+
+      // 7 bits -> 127
+      if(value < (1 << 7)){
+        return 1;
+      }
+
+      // 14 bits -> 16383
+      if(value < (1 << 14)){
+        return 2;
+      }
+
+      // 21 bits -> 2097151
+      if(value < (1 << 21)){
+        return 3;
+      }
+
+      // 28 bits -> 268435455
+      if(value < (1 << 28)){
+        return 4;
+      }
+
+      return 5;
+    },
+
+    _encodeVarint: function(value) {
+
+      // signed integers encoding
+      // (n << 1) ^ (n >> 31)
+      // OK but:
+      //      - javascript's integers are codded as Number objects (64bits floats)
+      //      - binary operator transtype Numbers into 32 bits signed (2's complements) integers
+      value = ~~value;
+      return this._encodeUnsignedVarint(value>=0?(value<<1):((Math.abs(value) << 1) ^ 1));
+    },
+
+    _encodeUnsignedVarint: function (value) {
+
+      var size = this._varintSize(value);
+      var i, head, b;
+
+      this._ensureBufferCapacityFor(size);
+
+      for(i = 0; i < size; i++){
+        head=128;
+        if(i==size-1) head = 0;
+        b = ((value >> (7*i)) & 127) ^ head;
+        this.view.setInt8(this.pos, b & 255);
+        this.pos+=1;
+      }
+      return size;
+    },
+
     _encodeLong: function(value) {
-      this._ensureBufferCapacityFor(8);
-      this.view.setInt32(this.pos, 0);
-      this.pos += 4;
-      this.view.setInt32(this.pos, value);
-      this.pos += 4;
+      this._ensureBufferCapacityFor(5);
+      // JS' binary operators only work on 32 bits signed integers. So nothing bigger that 2^31-1 can be encodded.
+      this._encodeVarint(value);
+    },
+
+    _encodeLongArray: function(value) {
+      this._ensureBufferCapacityFor(5);
+      // JS' binary operators only work on 32 bits signed integers. So nothing bigger that 2^31-1 can be encodded.
+      this._encodeUnsignedVarint(value.length);
+      value.forEach(function(e) {
+        if (typeof e !== "number") {
+          throw "All the elements of an Array should be of the same type";
+        }
+        this._encodeVarint(e);
+      });
+    },
+
+    _encodeInteger: function(value) {
+      this._ensureBufferCapacityFor(5);
+      this._encodeVarint(value);
+    },
+
+    _encodeIntegerArray: function(value) {
+      this._ensureBufferCapacityFor(5);
+      this._encodeUnsignedVarint(value.length);
+      value.forEach(function(e) {
+        if (typeof e !== "number") {
+          throw "All the elements of an Array should be of the same type";
+        }
+        this._encodeVarint(e);
+      });
     },
 
     _encodeDouble: function(value) {
@@ -390,10 +469,9 @@
     },
 
     _encodeDoubleArray: function(value) {
-      this._ensureBufferCapacityFor(4 + 8 * value.length);
+      this._ensureBufferCapacityFor(5 + 8 * value.length);
 
-      this.view.setInt32(this.pos, value.length);
-      this.pos += 4;
+     this._encodeUnsignedVarint(value.length);
       value.forEach(function(e) {
         if (typeof e !== "number") {
           throw "All the elements of an Array should be of the same type";
@@ -410,8 +488,7 @@
 
     _encodeBooleanArray: function(value) {
       this._ensureBufferCapacityFor(4 + value.length);
-      this.view.setInt32(this.pos, value.length);
-      this.pos += 4;
+      this._encodeUnsignedVarint(value.length);
       value.forEach(function(e) {
         if (typeof e !== "boolean") {
           throw "All the elements of an Array should be of the same type";
@@ -427,8 +504,7 @@
 
     _encodeByteArray: function(value) {
       this._ensureBufferCapacityFor(4 + value.length);
-      this.view.setInt32(this.pos, value.length);
-      this.pos += 4;
+      this._encodeUnsignedVarint(value.length);
       value.forEach(function(e) {
         if (typeof e !== "number") {
           throw "All the elements of an Array should be of the same type";
@@ -448,7 +524,3 @@
 
   };
 } (this));
-
-
-
-

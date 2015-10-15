@@ -1,6 +1,8 @@
 var SERVER_IP = "127.0.0.1";
 
 var http = require('http')
+    , express = require('express')
+    , app = express()
     , fs = require('fs')
     , WebSocketServer = require('ws').Server
     , WebSocket = require('ws')
@@ -22,23 +24,9 @@ netstream.sender = require("../netstream_sender").netstream.sender;
 //
 // Classical Http server to serve the files...
 //
-http.createServer(function(request, response) {
-  
-    fs.readFile('./' + request.url,
-    function(error, content) {
-      if (error) {
-        response.writeHead(500);
-        response.end();
-        //console.log(error);
-      }
-      else {
-        response.writeHead(200, {
-          'Content-Type': 'text/html'
-        });
-        response.end(content, 'utf-8');
-      }
-    });
-}).listen(8080, function(){console.log('Http Server running at http://127.0.0.1:8080/')});
+app.use(express.static('.'));
+app.use(express.static('../'));
+app.listen(8080, function(){console.log('Http Server running. go to  http://127.0.0.1:8080/testApp.html')});
 
 
 

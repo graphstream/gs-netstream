@@ -1,16 +1,14 @@
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ConnectException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.stream.netstream.NetStreamSender;
 import org.graphstream.stream.netstream.packing.Base64Packer;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 /**
  *
@@ -24,22 +22,22 @@ import org.graphstream.stream.netstream.packing.Base64Packer;
  */
 
 /**
- * 
+ *
  */
 public class Test1 {
 	String clientSentence;
     String capitalizedSentence;
-    
+
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 		new Test1();
 	}
 	public Test1() throws IOException{
 		ServerSocket welcomeSocket = new ServerSocket(2001);
-		System.out.println("Listening?..."); 
+		System.out.println("Listening?...");
         while(true)
         {
            Socket connectionSocket = welcomeSocket.accept();
@@ -60,9 +58,9 @@ public class Test1 {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}        	   
+			}
            }.start();
-           
+
         }
 
 
@@ -80,7 +78,7 @@ public class Test1 {
 			e.printStackTrace();
 		} catch(Exception e){
 			e.printStackTrace();
-			return;	
+			return;
 		}
 		System.err.printf("connected%n");
 		System.err.printf("sending...%n");
@@ -92,7 +90,7 @@ public class Test1 {
 		// - generate some events on the client side
 		String style = "node{fill-mode:plain;fill-color:#567;size:6px;}";
 		g.addAttribute("stylesheet", style);
-		for (int i = 0; i < 5000; i++) {
+		for (int i = 0; i < 50; i++) {
 			try {
 				//Thread.sleep(500);
 			} catch (Exception e) {

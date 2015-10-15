@@ -41,3 +41,15 @@ amps-standalone/
 # Mac stuff #
 #############
 .DS_Store
+
+# Netbeans #
+nbproject/
+
+# eclipse #
+.project
+.classpath
+.settings/
+
+#Java#
+*.class
+*.jar

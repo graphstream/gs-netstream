@@ -18,6 +18,7 @@
     this.base64 = true;
     this.onevent = null;
     this.onopen = null;
+    this.debug = true;
     // --------- init params
     for(var prop in options) {
       if(options.hasOwnProperty(prop) && this.hasOwnProperty(prop)) {
@@ -32,7 +33,7 @@
     } else {
       this._sizeOfInt = 4;
     }
-    
+
     this._tmp_view = new DataView(new ArrayBuffer(4));
 
     // ---------- Input buffer
@@ -41,14 +42,14 @@
     this._inputEnd = -1;
     this._inputBeg = 0;
     this._inputPos = 0;
-      
+
   };
 
 
   global.netstream.Transport.prototype = {
 
 
-    
+
     // Small periodical send/receive of packet to keap the socket open.
     _initHeartbeating: function () {
         var self = this;
@@ -71,9 +72,9 @@
       if(this.socket){
         return;
       }
-      
+
       var self = this;
-      
+
       // Creation / initialization
       if (typeof(WebSocket) === "undefined") {
           this.socket = new MozWebSocket(this.scheme + "://" + this.host + ":" + this.port + this.uri);
@@ -81,7 +82,8 @@
       else {
           this.socket = new WebSocket(this.scheme + "://" + this.host + ":" + this.port + this.uri);
       }
-      
+
+      this.socket.binaryType = "arraybuffer";
       // events
       this.refreshIntervalId = 0;
       this.socket.onopen = function () {
@@ -89,7 +91,7 @@
               netstream.LOGGER("(netstream.Transport): conection opened");
           }
           self._initHeartbeating();
-          
+
           // empty the queue
           for(var i=0; i<self._queue.length; i++){
             self.socket.send(self._queue[i]);
@@ -98,58 +100,58 @@
           if(typeof self.onopen === 'function'){
             self.onopen();
           }
-          
+
       };
       this.socket.onerror = function (e) {
           netstream.LOGGER("(netstream.Transport): ERROR on the WebSocket");
-          
+
       };
 
       this.socket.onmessage = function (e) {
         if (self.debug === true) {
-          netstream.LOGGER("(netstream.Transport): < Received a " + e.data.length + " bytes long data chunk.");
+          netstream.LOGGER("(netstream.Transport): < Received a " + e.data.byteLength + " bytes long data chunk.");
         }
         self._handleMsg(e.data);
       };
-      
-      
-      
+
+
+
     },
     sendEvent: function(buffer, start, length){
       //netstream.LOGGER("(netstream.transport.sendEvent) with buffer:"+buffer.byteLength+" ("+start+","+length+")");
-      
-      
-      // prepare buffer 
+
+
+      // prepare buffer
       if(this.base64){
         buffer = netstream.base64.encode(new Uint8Array(buffer,start, length));
         this._tmp_view.setUint32(0,buffer.length);
         buffer = netstream.base64.encode(this._tmp_view.buffer) + buffer;
         start=-1;
-      } 
-      else{
-        
       }
-      
-      
+      else{
+
+      }
+
+
       if( this.socket === null || this.socket.readyState < this.socket.OPEN){
         this.connect();
         this._queue.push(this.base64?buffer:buffer.slice(start,start+length));
-      }  
+      }
       else if ( this.socket.readyState === this.socket.OPEN){
         this.socket.send(this.base64?buffer:buffer.slice(start,start+length));
-      } 
+      }
       else {
         netstream.LOGGER("not sending....");
       }
     },
-    
+
     _do_send : function (buffer,start,length){
-      
+
     },
-    
-    
-    
-    
+
+
+
+
      _compactInputBuffer: function (limit) {
        if (this._inputBeg > this._sizeOfInt) {
              var off = this._inputBeg;
@@ -193,21 +195,23 @@
         //netstream.LOGGER("msg size = "+size);
         return size;
     },
-   
+
     _handleMsg: function (encodedMsg) {
          var limit = 0;
          // Index past the last byte this.read during the current
          // invocation.
          var nbytes = 0;
          // Number of bytes this.read.
-         nbytes = encodedMsg.length;
+         nbytes = encodedMsg.byteLength;
          this._ensureInputBufferCapacity(nbytes);
-         
-          var encodedArray = new Uint8Array(this._inputBuffer, this._inputPos, nbytes);
-       
-         for (var i = 0; i < nbytes; i++) {
-             encodedArray[i] = encodedMsg.charCodeAt(i);
-         }
+
+         var encodedArray = new Uint8Array(this._inputBuffer, this._inputPos, nbytes);
+
+         encodedArray.set(new Uint8Array(encodedMsg));
+        //  for (var i = 0; i < nbytes; i++) {
+        //      encodedArray[i] = encodedMsg[i];
+        //  }
+
          limit = this._inputPos + nbytes;
          if (nbytes <= 0)
          return;
@@ -221,7 +225,7 @@
                  this._inputEnd = this._unpackInputMessageSize(0) + this._sizeOfInt;
                  this._inputBeg = this._sizeOfInt;
              } else {
-                 // The header is incomplete, wait next call to complete it.	
+                 // The header is incomplete, wait next call to complete it.
                  //console.log("The header is incomplete, wait next call to complete it.");
                  this._inputPos = limit;
              }
@@ -286,20 +290,21 @@
              }
          }
      },
-    
+
     _receiveEvent: function(){
+      var msg;
       if(this.base64){
         var arr = new Uint8Array(this._inputBuffer, this._inputBeg, this._inputEnd - this._inputBeg);
-        var msg = new DataView(netstream.base64.decode(arr).buffer);
+        msg = new DataView(netstream.base64.decode(arr).buffer);
       } else {
-        var msg = new DataView(this.InputBuffer, this._inputBeg, this._inputEnd - this._inputBeg);
+        msg = new DataView(this.InputBuffer, this._inputBeg, this._inputEnd - this._inputBeg);
       }
       this.onevent(msg);
     }
-    
-    
+
+
   };
-  
+
 
 
 } (this));
