@@ -257,7 +257,7 @@ namespace netstream
 			self.sin_addr.s_addr = htonl(INADDR_ANY);
 
 			// Assign a port number to the socket
-			if ( bind(server_socket_, (struct sockaddr*)&self, sizeof(self)) != 0 )
+			if ( ::bind(server_socket_, (struct sockaddr*)&self, sizeof(self)) != 0 )
 				BailOnNetStreamSocketError("netstream::NetStreamSocket::accept() Unable to create listening socket");
 
 
