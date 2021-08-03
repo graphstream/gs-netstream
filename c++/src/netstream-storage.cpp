@@ -90,7 +90,7 @@ namespace netstream
 	* Reads a char form the array
 	* @return The read char (between 0 and 255)
 	*/
-	unsigned char NetStreamStorage::readChar() throw(std::invalid_argument)
+	unsigned char NetStreamStorage::readChar()
 	{
 		if ( !valid_pos() )
 		{
@@ -104,7 +104,7 @@ namespace netstream
 	/**
 	*
 	*/
-	void NetStreamStorage::writeChar(unsigned char value) throw()
+	void NetStreamStorage::writeChar(unsigned char value)
 	{
 		store.push_back(value);
 		iter_ = store.begin();
@@ -138,7 +138,7 @@ namespace netstream
 	* Reads a varint form the array
 	* @return The read varint 
 	*/
-	int_fast64_t NetStreamStorage::readVarint()	throw(std::invalid_argument)
+	int_fast64_t NetStreamStorage::readVarint()
 	{
 		uint_fast64_t number = readUnsignedVarint();
 		return (int_fast64_t)((number & 1) == 0) ? number >> 1 : -(number >> 1);
@@ -147,7 +147,7 @@ namespace netstream
 	/**
 	*
 	*/
-	void NetStreamStorage::writeVarint(int_fast64_t value) throw(std::invalid_argument)
+	void NetStreamStorage::writeVarint(int_fast64_t value)
 	{
 		writeUnsignedVarint((value << 1) ^ (value >> 63));
 	}
@@ -156,7 +156,7 @@ namespace netstream
 	* Reads a unsigned varint form the array
 	* @return The read u_varint 
 	*/
-	uint_fast64_t NetStreamStorage::readUnsignedVarint()	throw(std::invalid_argument)
+	uint_fast64_t NetStreamStorage::readUnsignedVarint()
 	{
 		// TODO
 		return 0;
@@ -165,7 +165,7 @@ namespace netstream
 	/**
 	*
 	*/
-	void NetStreamStorage::writeUnsignedVarint(uint_fast64_t value) throw(std::invalid_argument)
+	void NetStreamStorage::writeUnsignedVarint(uint_fast64_t value)
 	{
 		size_t size = varintSize(value);
 		
@@ -185,7 +185,7 @@ namespace netstream
 	* Reads a byte form the array
 	* @return The read byte (between -128 and 127)
 	*/
-	int NetStreamStorage::readByte()	throw(std::invalid_argument)
+	int NetStreamStorage::readByte()
 	{
 		int i = static_cast<int>(readChar());
 		if (i < 128) return i;
@@ -197,7 +197,7 @@ namespace netstream
 	/**
 	*
 	*/
-	void NetStreamStorage::writeByte(int value) throw(std::invalid_argument)
+	void NetStreamStorage::writeByte(int value)
 	{
 		if (value < -128 || value > 127)
 		{
@@ -212,7 +212,7 @@ namespace netstream
 	* Reads an unsigned byte form the array
 	* @return The read byte (between 0 and 255)
 	*/
-	int NetStreamStorage::readUnsignedByte()	throw(std::invalid_argument)
+	int NetStreamStorage::readUnsignedByte()
 	{
 		return static_cast<int>(readChar());
 	}
@@ -222,7 +222,7 @@ namespace netstream
 	/**
 	*
 	*/
-	void NetStreamStorage::writeUnsignedByte(int value) throw(std::invalid_argument)
+	void NetStreamStorage::writeUnsignedByte(int value)
 	{
 		if (value < 0 || value > 255)
 		{
@@ -237,7 +237,7 @@ namespace netstream
 	* Reads a string form the array
 	* @return The read string
 	*/
-	std::string NetStreamStorage::readString() throw(std::invalid_argument)
+	std::string NetStreamStorage::readString()
 	{
 		int len = readInt();
 		checkReadSafe(len);
@@ -254,7 +254,7 @@ namespace netstream
 	* Writes a string into the array;
 	* @param s		The string to be written
 	*/
-	void NetStreamStorage::writeString(const std::string &s) throw()
+	void NetStreamStorage::writeString(const std::string &s)
 	{
 		writeUnsignedVarint(static_cast<size_t>(s.length()));
 		store.insert(store.end(), s.begin(), s.end());
@@ -267,7 +267,7 @@ namespace netstream
 	* Reads a string list form the array
 	* @return The read string
 	*/
-	std::vector<std::string> NetStreamStorage::readStringList() throw(std::invalid_argument)
+	std::vector<std::string> NetStreamStorage::readStringList()
 	{
 		std::vector<std::string> tmp;
 		const int len = readInt();
@@ -285,7 +285,7 @@ namespace netstream
 	* Writes a string into the array;
 	* @param s		The string to be written
 	*/
-	void NetStreamStorage::writeStringList(const std::vector<std::string> &s) throw()
+	void NetStreamStorage::writeStringList(const std::vector<std::string> &s)
 	{
 		writeUnsignedVarint(s.size());
         for (std::vector<std::string>::const_iterator it = s.begin(); it!=s.end() ; it++) 
@@ -303,7 +303,7 @@ namespace netstream
 	*
 	* @return the unspoiled integer value (between -32768 and 32767)
 	*/
-	int NetStreamStorage::readShort() throw(std::invalid_argument)
+	int NetStreamStorage::readShort()
 	{
 		short value = 0;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -313,7 +313,7 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	void NetStreamStorage::writeShort( int value ) throw(std::invalid_argument)
+	void NetStreamStorage::writeShort( int value )
 	{
 		if (value < -32768 || value > 32767)
 		{
@@ -335,7 +335,7 @@ namespace netstream
 	*
 	* @return the unspoiled integer value (between -2.147.483.648 and 2.147.483.647)
 	*/
-	int NetStreamStorage::readInt() throw(std::invalid_argument)
+	int NetStreamStorage::readInt()
 	{
 		int value = 0;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -345,7 +345,7 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	void NetStreamStorage::writeInt( int value ) throw()
+	void NetStreamStorage::writeInt( int value )
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
 		writeByEndianess(p_value, 4);
@@ -359,7 +359,7 @@ namespace netstream
 	*
 	* @return the unspoiled integer value (between -??? and ???)
 	*/
-	long NetStreamStorage::readLong() throw(std::invalid_argument)
+	long NetStreamStorage::readLong()
 	{
 		long value = 0L;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -369,7 +369,7 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	void NetStreamStorage::writeLong( long value ) throw()
+	void NetStreamStorage::writeLong( long value )
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
 		writeByEndianess(p_value, 8);
@@ -384,7 +384,7 @@ namespace netstream
 	*
 	* @return the unspoiled float value
 	*/
-	float NetStreamStorage::readFloat() throw(std::invalid_argument)
+	float NetStreamStorage::readFloat()
 	{
 		float value = 0;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -394,7 +394,7 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	void NetStreamStorage::writeFloat( float value ) throw()
+	void NetStreamStorage::writeFloat( float value )
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
 		writeByEndianess(p_value, 4);
@@ -402,7 +402,7 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	void NetStreamStorage::writeDouble( double value ) throw ()
+	void NetStreamStorage::writeDouble( double value )
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
 		writeByEndianess(p_value, 8);
@@ -410,7 +410,7 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	double NetStreamStorage::readDouble( ) throw (std::invalid_argument)
+	double NetStreamStorage::readDouble( )
 	{
 		double value = 0;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
@@ -437,7 +437,7 @@ namespace netstream
 
 
 	// ----------------------------------------------------------------------
-	void NetStreamStorage::checkReadSafe(unsigned int num) const  throw(std::invalid_argument)
+	void NetStreamStorage::checkReadSafe(unsigned int num) const
 	{
 		if (std::distance(iter_, store.end()) < static_cast<int>(num))
 		{

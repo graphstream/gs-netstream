@@ -141,8 +141,8 @@ namespace netstream
 	// ----------------------------------------------------------------------
 	void 
 		NetStreamSocket::
-		BailOnNetStreamSocketError( std::string context) 
-		const throw( NetStreamSocketException )
+		BailOnNetStreamSocketError( std::string context)
+	        const
 	{
 #ifdef WIN32
 		int e = WSAGetLastError();
@@ -165,8 +165,8 @@ namespace netstream
 	// ----------------------------------------------------------------------
 	bool 
 		NetStreamSocket::
-		datawaiting(int sock) 
-		const throw()
+		datawaiting(int sock)
+	        const
 	{
 		fd_set fds;
 		FD_ZERO( &fds );
@@ -217,7 +217,6 @@ namespace netstream
 	void 
 		NetStreamSocket::
 		accept()
-		throw( NetStreamSocketException )
 	{
 		if( socket_ >= 0 )
 			return;
@@ -282,7 +281,6 @@ namespace netstream
 	void 
 		NetStreamSocket::
 		set_blocking(bool blocking) 
-		throw(NetStreamSocketException )
 	{
 		blocking_ = blocking;
 
@@ -310,7 +308,6 @@ namespace netstream
 	void 
 		NetStreamSocket::
 		connect()
-		throw( NetStreamSocketException )
 	{
 		in_addr addr;
 		if( !atoaddr( host_.c_str(), addr) )
@@ -359,7 +356,6 @@ namespace netstream
 	void 
 		NetStreamSocket::
 		send( std::vector<unsigned char> b) 
-		throw( NetStreamSocketException )
 	{
 		if( socket_ < 0 ) return;
 
@@ -411,7 +407,6 @@ namespace netstream
 	void
 		NetStreamSocket::
 		sendExact( const NetStreamStorage &b)
-		throw( NetStreamSocketException )
 	{
 		int length = static_cast<int>(b.size());
 		NetStreamStorage length_storage;
@@ -428,7 +423,6 @@ namespace netstream
 	vector<unsigned char> 
 		NetStreamSocket::
 		receive(int bufSize)
-		throw( NetStreamSocketException )
 	{
 		vector<unsigned char> b;
 
@@ -474,7 +468,6 @@ namespace netstream
 	bool
 		NetStreamSocket::
 		receiveExact( NetStreamStorage &msg )
-		throw( NetStreamSocketException )
 	{
 		/* receive length of vector */
 		unsigned char * const bufLength = new unsigned char[4];
@@ -552,7 +545,6 @@ namespace netstream
 	bool 
 		NetStreamSocket::
 		is_blocking() 
-		throw()
 	{
 		return blocking_;
 	}
