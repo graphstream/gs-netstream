@@ -1,0 +1,6 @@
+netstream-main
+*.exe
+*.dll
+*.so
+*.o
+*.a

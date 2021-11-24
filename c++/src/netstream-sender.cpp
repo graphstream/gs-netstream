@@ -55,9 +55,9 @@ void NetStreamSender::init()
         std::cout<<"."<<std::flush;
       wait_for_server++;
       #ifdef WIN32
-        Sleep(ms);
+        Sleep(1); //milliseconds
       #else
-        usleep(1000);
+        usleep(1000);//microseconds
       #endif
     }
   }
