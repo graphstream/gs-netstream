@@ -26,8 +26,8 @@
 #endif
 
 // Disable exception handling warnings
-#ifdef WIN32
-	#pragma warning( disable : 4290 )
+#ifdef _WIN32
+# pragma warning( disable : 4290 )
 #endif
 
 #include <string>
@@ -97,7 +97,7 @@ namespace netstream
 	private:
 		void init();
 		void BailOnNetStreamSocketError( std::string ) const ;
-#ifdef WIN32
+#ifdef _WIN32
 		std::string GetWinsockErrorString(int err) const;
 #endif
 		bool atoaddr(std::string, struct in_addr& addr);
@@ -110,7 +110,7 @@ namespace netstream
 		bool blocking_;
 
 		bool verbose_;
-#ifdef WIN32
+#ifdef _WIN32
 		static bool init_windows_sockets_;
 		static bool windows_sockets_initialized_;
 		static int instance_count_;
@@ -121,11 +121,4 @@ namespace netstream
 
 #endif // BUILD_TCPIP
 
-
-/*-----------------------------------------------------------------------
-* Source  $Source: $
-* Version $Revision: 197 $
-* Date    $Date: 2008-04-29 17:40:51 +0200 (Tue, 29 Apr 2008) $
-*-----------------------------------------------------------------------
-* $Log:$
-*-----------------------------------------------------------------------*/
+// vim: ts=4:sw=4:noet
