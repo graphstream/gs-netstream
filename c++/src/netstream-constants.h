@@ -154,16 +154,19 @@ namespace netstream{
  * An array of bytes. Followed by first, a 16-bits integer for the number
  * of integers and then, a list of signed bytes.
  */
+
  const unsigned char TYPE_BYTE_ARRAY=0x53;
 /**
  * Followed by an 16-bit signed integer (a short)
  */
    const unsigned char TYPE_SHORT=0x54;
+
 /**
  * An array of shorts. Followed by first, a 16-bits integer for the number
  * of integers and then, a list of 16-bit signed shorts
  */
  const unsigned char TYPE_SHORT_ARRAY=0x55;
+ 
 /**
  * Followed by an 32-bit signed integer
  */
@@ -173,6 +176,7 @@ namespace netstream{
  * of integers and then, a list of 32-bit signed integers
  */
  const unsigned char TYPE_INT_ARRAY=0x57;
+ 
 /**
  *  Followed by an 64-bit signed integer
  */
@@ -182,6 +186,9 @@ namespace netstream{
  * longs and then, a list of 62-bit signed integers
  */
  const unsigned char TYPE_LONG_ARRAY=0x59;
+
+/** NOTE: see also LONGLONG below, out of order */
+
 /**
  *  Followed by a single precision 32-bits floating point number
  */
@@ -218,6 +225,19 @@ namespace netstream{
  * themselves. The elements themselves have to give their type.
  */
  const unsigned char TYPE_ARRAY=0x60;
+
+/**
+ *  Followed by an 64-bit signed integer
+ */
+   const unsigned char TYPE_LONGLONG=0x61;
+/**
+ * An array of longs. Followed by first, a 16-bits integer for the number of
+ * longs and then, a list of 62-bit signed integers
+ */
+ const unsigned char TYPE_LONGLONG_ARRAY=0x62;
+
+
+
 
 }// end netstream namespace
 

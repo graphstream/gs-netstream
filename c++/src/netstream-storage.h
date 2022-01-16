@@ -99,6 +99,9 @@ public:
 	virtual long readLong() ;
 	virtual void writeLong(long) ;
 
+	virtual long long readLongLong() ;
+	virtual void writeLongLong(long long) ;
+
 	virtual float readFloat() ;
 	virtual void writeFloat( float ) ;
 

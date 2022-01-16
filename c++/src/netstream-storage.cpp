@@ -114,21 +114,21 @@ namespace netstream
 
 	size_t NetStreamStorage::varintSize(uint_fast64_t data){
 		// 7 bits -> 127
-		if(data < (1L << 7)){return 1;}
+		if(data < (1LL << 7)){return 1;}
 		// 14 bits -> 16383
-		if(data < (1L << 14)){return 2;}
+		if(data < (1LL << 14)){return 2;}
 		// 21 bits -> 2097151
-		if(data < (1L << 21)){return 3;}
+		if(data < (1LL << 21)){return 3;}
 		// 28 bits -> 268435455
-		if(data < (1L << 28)){return 4;}
+		if(data < (1LL << 28)){return 4;}
 		// 35 bits -> 34359738367
-		if(data < (1L << 35)){return 5;}
+		if(data < (1LL << 35)){return 5;}
 		// 42 bits -> 4398046511103
-		if(data < (1L << 42)){return 6;}
+		if(data < (1LL << 42)){return 6;}
 		// 49 bits -> 562949953421311
-		if(data < (1L << 49)){return 7;}
+		if(data < (1LL << 49)){return 7;}
 		// 56 bits -> 72057594037927935
-		if(data < (1L << 56)){return 8;}	
+		if(data < (1LL << 56)){return 8;}	
 		return 9;
 	}
 
@@ -363,7 +363,7 @@ namespace netstream
 	{
 		long value = 0L;
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
-		readByEndianess(p_value, 8);
+		readByEndianess(p_value, sizeof(long));
 		return value;
 	}
 
@@ -372,8 +372,25 @@ namespace netstream
 	void NetStreamStorage::writeLong( long value ) 
 	{
 		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
-		writeByEndianess(p_value, 8);
+		writeByEndianess(p_value, sizeof(long));
 	}
+
+
+
+	long long NetStreamStorage::readLongLong() 
+	{
+		long long value = 0L;
+		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
+		readByEndianess(p_value, sizeof(long long));
+		return value;
+	}
+	
+	void NetStreamStorage::writeLongLong( long long value ) 
+	{
+		unsigned char *p_value = reinterpret_cast<unsigned char*>(&value);
+		writeByEndianess(p_value, sizeof(long long));
+	}	
+
 
 
 	// ----------------------------------------------------------------------
