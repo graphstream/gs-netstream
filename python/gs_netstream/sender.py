@@ -14,14 +14,16 @@ Hugo Hromic <hugo.hromic@insight-centre.org>
 
 import socket
 import struct
-import varint
+from . import varint
+from .constants import *
 import logging
 from random import random
-from common import AttributeSink, ElementSink
-from constants import *
+from .common import AttributeSink, ElementSink
 
-class DefaultNetStreamTransport(object):
+
+class DefaultNetStreamTransport:
     """Default transport class using TCP/IP networking."""
+
     def __init__(self, host, port):
         """Initialize using host and port."""
         self.host = host
@@ -51,6 +53,7 @@ class DefaultNetStreamTransport(object):
             self.socket.close()
             self.socket = None
             logging.info("disconnected from remote server")
+
 
 class NetStreamSender(AttributeSink, ElementSink):
     """One client must send to only one identified stream (streamID, host, port)"""
@@ -88,7 +91,7 @@ class NetStreamSender(AttributeSink, ElementSink):
         packet.extend(self.stream_buff)
         packet.extend(event)
         buff = bytearray()
-        buff.extend(struct.pack("!i", len(packet))) # fixed 4-bytes size!
+        buff.extend(struct.pack("!i", len(packet)))  # fixed 4-bytes size!
         buff.extend(packet)
         self.transport.send(buff)
 
@@ -110,15 +113,11 @@ class NetStreamSender(AttributeSink, ElementSink):
             if is_array:
                 return TYPE_INT_ARRAY
             return TYPE_INT
-        elif isinstance(value, long):
-            if is_array:
-                return TYPE_LONG_ARRAY
-            return TYPE_LONG
         elif isinstance(value, float):
             if is_array:
                 return TYPE_DOUBLE_ARRAY
             return TYPE_DOUBLE
-        elif isinstance(value, str) or isinstance(value, unicode):
+        elif isinstance(value, str):
             return TYPE_STRING
         elif isinstance(value, dict):
             raise NotImplementedError("dicts are not supported")
@@ -179,11 +178,11 @@ class NetStreamSender(AttributeSink, ElementSink):
 
     def encode_long(self, value):
         """Encode a long type."""
-        return self.encode_int(value) # same as int for now
+        return self.encode_int(value)  # same as int for now
 
     def encode_long_array(self, value):
         """Encode an array of long values."""
-        return self.encode_int_array(value) # same as int_array for now
+        return self.encode_int_array(value)  # same as int_array for now
 
     def encode_double(self, value):
         """Encode a double type."""
@@ -509,7 +508,8 @@ class NetStreamSender(AttributeSink, ElementSink):
             "attribute": attribute
         })
 
-class NetStreamProxyGraph():
+
+class NetStreamProxyGraph:
     """
     This is a utility class that handles 'source id' and 'time id' synchronization tokens.
     It proposes utile classes that allow to directly send events through the network pipe.
