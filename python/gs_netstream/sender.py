@@ -14,7 +14,7 @@ Hugo Hromic <hugo.hromic@insight-centre.org>
 
 import socket
 import struct
-from typing import List, Any
+from typing import List, Any, Optional
 
 from .constants import *
 import logging
@@ -61,16 +61,19 @@ class NetStreamSender(AttributeSink, ElementSink):
 
     def __init__(self, port, host="localhost", stream="default"):
         """Initialize using port, host (optional) and stream ID (optional)."""
-        self.host = host
-        self.port = port
-        self.stream = None
-        self.stream_buff = None
+        self.host: str = host
+        self.port: int = port
+        self.stream: Optional[str] = None
+        self.stream_buff: Optional[bytearray] = None
         self.set_stream(stream)
-        self.source_id = None
-        self.source_id_buff = None
+        self.source_id: Optional[str] = None
+        self.source_id_buff: Optional[bytearray] = None
         self.set_source_id("")
-        self.transport = None
+        self.transport: Optional[DefaultNetStreamTransport] = None
         self.connect()
+
+    def __del__(self):
+        self.close()
 
     def set_stream(self, stream):
         """Set and cache a stream ID."""
@@ -98,11 +101,11 @@ class NetStreamSender(AttributeSink, ElementSink):
 
     def close(self):
         """Close the underlying transport."""
-        if self.transport:
+        if self.transport is not None:
             self.transport.close()
 
     def send_msg(self, source_id: str, values: List[Any], value_types: List[int]):
-        if not source_id is self.source_id:
+        if source_id != self.source_id:
             self.set_source_id(source_id)
         buff = get_msg(values, value_types)
         self.send(buff)
