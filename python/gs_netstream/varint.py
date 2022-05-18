@@ -1,27 +1,13 @@
 #!/usr/bin/env python
-
+import numpy as np
+from .constants import ENCODING_SIZES
 """Implementation for encoding unsigned varints."""
 
 
-def encoding_size(value):
+def encoding_size(value: int):
     """Computes the encoding size of a value."""
-    if value < (1 << 7):
-        return 1
-    if value < (1 << 14):
-        return 2
-    if value < (1 << 21):
-        return 3
-    if value < (1 << 28):
-        return 4
-    if value < (1 << 35):
-        return 5
-    if value < (1 << 42):
-        return 6
-    if value < (1 << 49):
-        return 7
-    if value < (1 << 56):
-        return 8
-    return 9
+    dist = (ENCODING_SIZES - value) <= 0
+    return 9 if not np.all(dist) else np.argmin(dist) + 1
 
 
 def encode_unsigned(value):
