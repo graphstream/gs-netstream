@@ -78,7 +78,7 @@ class NetStreamSender(AttributeSink, ElementSink):
         self.stream = stream
         self.stream_buff = encode_value(stream, TYPE_STRING)
 
-    def set_source_id(self, source_id):
+    def set_source_id(self, source_id: str):
         """Set and cache a source ID."""
         self.source_id = source_id
         self.source_id_buff = encode_value(source_id, TYPE_STRING)
@@ -113,7 +113,7 @@ class NetStreamSender(AttributeSink, ElementSink):
         buff = get_msg(values, value_types)
         self.send(buff)
 
-    def node_added(self, source_id, time_id, node_id):
+    def node_added(self, source_id: str, time_id: int, node_id: str):
         """A node was added."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_ADD_NODE, source_id, time_id, node_id],
@@ -124,7 +124,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "node_id": node_id
         })
 
-    def node_removed(self, source_id, time_id, node_id):
+    def node_removed(self, source_id: str, time_id: int, node_id: str):
         """A node was removed."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_DEL_NODE, source_id, time_id, node_id],
@@ -135,7 +135,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "node_id": node_id
         })
 
-    def edge_added(self, source_id, time_id, edge_id, from_node, to_node, directed):
+    def edge_added(self, source_id: str, time_id: int, edge_id: str, from_node: str, to_node: str, directed: bool):
         """An edge was added."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_ADD_EDGE, source_id, time_id, edge_id, from_node, to_node, directed],
@@ -150,7 +150,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "directed": directed
         })
 
-    def edge_removed(self, source_id, time_id, edge_id):
+    def edge_removed(self, source_id: str, time_id: int, edge_id: str):
         """An edge was removed."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_DEL_EDGE, source_id, time_id, edge_id],
@@ -161,7 +161,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "node_id": edge_id
         })
 
-    def step_begun(self, source_id, time_id, timestamp):
+    def step_begun(self, source_id: str, time_id: int, timestamp: int):
         """A new step begun."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_STEP, source_id, time_id, timestamp],
@@ -172,7 +172,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "timestamp": timestamp
         })
 
-    def graph_cleared(self, source_id, time_id):
+    def graph_cleared(self, source_id: str, time_id: int):
         """The graph was cleared."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_CLEARED, source_id, time_id],
@@ -182,7 +182,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "time_id": time_id
         })
 
-    def graph_attribute_added(self, source_id, time_id, attribute, value):
+    def graph_attribute_added(self, source_id: str, time_id: int, attribute: str, value):
         """A graph attribute was added."""
         dtype = get_type(value)
         self.send_msg(source_id=source_id,
@@ -195,7 +195,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "value": value
         })
 
-    def graph_attribute_changed(self, source_id, time_id, attribute, old_value, new_value):
+    def graph_attribute_changed(self, source_id: str, time_id: int, attribute: str, old_value, new_value):
         """A graph attribute was changed."""
         old_value_dtype = get_type(old_value)
         new_value_dtype = get_type(new_value)
@@ -213,7 +213,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "new_value": new_value
         })
 
-    def graph_attribute_removed(self, source_id, time_id, attribute):
+    def graph_attribute_removed(self, source_id: str, time_id: int, attribute: str):
         """A graph attribute was removed."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_DEL_GRAPH_ATTR, source_id, time_id, attribute],
@@ -224,7 +224,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "attribute": attribute
         })
 
-    def node_attribute_added(self, source_id, time_id, node_id, attribute, value):
+    def node_attribute_added(self, source_id: str, time_id: int, node_id: str, attribute: str, value):
         """A node attribute was added."""
         dtype = get_type(value)
         self.send_msg(source_id=source_id,
@@ -238,7 +238,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "value": value
         })
 
-    def node_attribute_changed(self, source_id, time_id, node_id, attribute, old_value, new_value):
+    def node_attribute_changed(self, source_id: str, time_id: int, node_id: str, attribute: str, old_value, new_value):
         """A node attribute was changed."""
         old_value_dtype = get_type(old_value)
         new_value_dtype = get_type(new_value)
@@ -257,7 +257,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "new_value": new_value
         })
 
-    def node_attribute_removed(self, source_id, time_id, node_id, attribute):
+    def node_attribute_removed(self, source_id: str, time_id: int, node_id: str, attribute: str):
         """A node attribute was removed."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_DEL_NODE_ATTR, source_id, time_id, node_id, attribute],
@@ -269,7 +269,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "attribute": attribute
         })
 
-    def edge_attribute_added(self, source_id, time_id, edge_id, attribute, value):
+    def edge_attribute_added(self, source_id: str, time_id: int, edge_id: str, attribute: str, value):
         """An edge attribute was added."""
         dtype = get_type(value)
         self.send_msg(source_id=source_id,
@@ -283,7 +283,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "value": value
         })
 
-    def edge_attribute_changed(self, source_id, time_id, edge_id, attribute, old_value, new_value):
+    def edge_attribute_changed(self, source_id: str, time_id: int, edge_id: str, attribute: str, old_value, new_value):
         """An edge attribute was changed."""
         old_value_dtype = get_type(old_value)
         new_value_dtype = get_type(new_value)
@@ -303,7 +303,7 @@ class NetStreamSender(AttributeSink, ElementSink):
             "new_value": new_value
         })
 
-    def edge_attribute_removed(self, source_id, time_id, edge_id, attribute):
+    def edge_attribute_removed(self, source_id: str, time_id: int, edge_id: str, attribute: str):
         """An edge attribute was removed."""
         self.send_msg(source_id=source_id,
                       values=[EVENT_DEL_EDGE_ATTR, source_id, time_id, edge_id, attribute],
@@ -329,67 +329,70 @@ class NetStreamProxyGraph:
         self.source_id = source_id if source_id else "nss%d" % (1000 * random())
         self.time_id = 0
 
-    def add_node(self, node):
-        """Add a node to the graph."""
-        self.sender.node_added(self.source_id, self.time_id, node)
+    def run_sender_method(self, sender_method, *args, **kwargs):
+        sender_method(self.source_id, self.time_id, *args, **kwargs)
         self.time_id += 1
 
-    def remove_node(self, node):
+    def add_node(self, node: str):
+        """Add a node to the graph."""
+        self.run_sender_method(self.sender.node_added, node)
+
+    def remove_node(self, node: str):
         """Remove a node from the graph."""
         self.sender.node_removed(self.source_id, self.time_id, node)
         self.time_id += 1
 
-    def add_edge(self, edge, from_node, to_node, directed=False):
+    def add_edge(self, edge: str, from_node: str, to_node: str, directed: bool = False):
         """Add an edge to the graph."""
         self.sender.edge_added(self.source_id, self.time_id, edge, from_node, to_node, directed)
         self.time_id += 1
 
-    def remove_edge(self, edge):
+    def remove_edge(self, edge: str):
         """Remove an edge from the graph."""
         self.sender.edge_removed(self.source_id, self.time_id, edge)
         self.time_id += 1
 
-    def add_attribute(self, attribute, value):
+    def add_attribute(self, attribute: str, value):
         """Add an attribute to the graph."""
         self.sender.graph_attribute_added(self.source_id, self.time_id, attribute, value)
         self.time_id += 1
 
-    def remove_attribute(self, attribute):
+    def remove_attribute(self, attribute: str):
         """Remove an attribute from the graph."""
         self.sender.graph_attribute_removed(self.source_id, self.time_id, attribute)
         self.time_id += 1
 
-    def change_attribute(self, attribute, old_value, new_value):
+    def change_attribute(self, attribute: str, old_value, new_value):
         """Change an attribute of the graph."""
         self.sender.graph_attribute_changed(self.source_id, self.time_id, attribute, old_value, new_value)
         self.time_id += 1
 
-    def add_node_attribute(self, node, attribute, value):
+    def add_node_attribute(self, node: str, attribute: str, value):
         """Add an attribute to a node."""
         self.sender.node_attribute_added(self.source_id, self.time_id, node, attribute, value)
         self.time_id += 1
 
-    def remove_node_attibute(self, node, attribute):
+    def remove_node_attibute(self, node: str, attribute: str):
         """Remove an attribute from a node."""
         self.sender.node_attribute_removed(self.source_id, self.time_id, node, attribute)
         self.time_id += 1
 
-    def change_node_attribute(self, node, attribute, old_value, new_value):
+    def change_node_attribute(self, node: str, attribute: str, old_value, new_value):
         """Change an attribute of a node."""
         self.sender.node_attribute_changed(self.source_id, self.time_id, node, attribute, old_value, new_value)
         self.time_id += 1
 
-    def add_edge_attribute(self, edge, attribute, value):
+    def add_edge_attribute(self, edge: str, attribute: str, value):
         """Add an attribute to an edge."""
         self.sender.edge_attribute_added(self.source_id, self.time_id, edge, attribute, value)
         self.time_id += 1
 
-    def remove_edge_attribute(self, edge, attribute):
+    def remove_edge_attribute(self, edge: str, attribute: str):
         """Remove an attribute from an edge."""
         self.sender.edge_attribute_removed(self.source_id, self.time_id, edge, attribute)
         self.time_id += 1
 
-    def change_edge_attribute(self, edge, attribute, old_value, new_value):
+    def change_edge_attribute(self, edge: str, attribute: str, old_value, new_value):
         """Change an attribute of an edge."""
         self.sender.edge_attribute_changed(self.source_id, self.time_id, edge, attribute, old_value, new_value)
         self.time_id += 1
@@ -399,7 +402,7 @@ class NetStreamProxyGraph:
         self.sender.graph_cleared(self.source_id, self.time_id)
         self.time_id += 1
 
-    def step_begins(self, time):
+    def step_begins(self, time: int):
         """Begin a step."""
         self.sender.step_begun(self.source_id, self.time_id, time)
         self.time_id += 1
