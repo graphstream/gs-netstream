@@ -1,4 +1,8 @@
 """Proxy Netstream graph class"""
+from random import random
+from typing import Optional
+
+from gs_netstream.sender import NetStreamSender
 
 
 class NetStreamProxyGraph:
@@ -7,13 +11,13 @@ class NetStreamProxyGraph:
     It proposes utile classes that allow to directly send events through the network pipe.
     """
 
-    def __init__(self, sender, source_id=None):
+    def __init__(self, sender: Optional[NetStreamSender] = None, source_id: Optional[str] = None, port: int = 8008):
         """Constructor can be with one NetStreamSender object and a source id OR with with 4 args.
 
         Notes:
             4 args: Source ID, Stream ID, Host, and port number
         """
-        self.sender = sender
+        self.sender = sender if sender is not None else NetStreamSender(port)
         self.source_id = source_id if source_id else "nss%d" % (1000 * random())
         self.time_id = 0
 

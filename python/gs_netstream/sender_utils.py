@@ -38,7 +38,7 @@ def get_type(value: Any) -> int:
     """Get the data type for a given value."""
     is_array = isinstance(value, list)
     value_type_str = type(value[0] if is_array else value).__name__
-    netstream_type = value_type_str.get(value_type_str, None)
+    netstream_type = TYPES_CONVERTER.get(value_type_str, None)
     if netstream_type is None:
         raise NotImplementedError("dicts are not supported")
 
