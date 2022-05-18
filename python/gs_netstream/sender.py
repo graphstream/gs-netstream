@@ -20,7 +20,7 @@ from .constants import *
 import logging
 from random import random
 from .common import AttributeSink, ElementSink
-from .sender_utils import get_msg, get_type
+from .sender_utils import get_msg, get_type, encode_value
 
 
 class DefaultNetStreamTransport:
@@ -76,12 +76,12 @@ class NetStreamSender(AttributeSink, ElementSink):
     def set_stream(self, stream):
         """Set and cache a stream ID."""
         self.stream = stream
-        self.stream_buff = self.encode_string(stream)
+        self.stream_buff = encode_value(stream, TYPE_STRING)
 
     def set_source_id(self, source_id):
         """Set and cache a source ID."""
         self.source_id = source_id
-        self.source_id_buff = self.encode_string(source_id)
+        self.source_id_buff = encode_value(source_id, TYPE_STRING)
 
     def connect(self):
         """Connect to the underlying transport."""
