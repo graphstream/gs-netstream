@@ -89,6 +89,7 @@ def encode_byte(value) -> bytearray:
 
 
 TYPE_TO_ENCODER = {
+    TYPE_BYTE: encode_byte,
     TYPE_BOOLEAN: encode_boolean,
     TYPE_BOOLEAN_ARRAY: encode_boolean_array,
     TYPE_INT: encode_unsigned,
@@ -103,3 +104,7 @@ def encode_value(value: Any, dtype: int) -> Optional[bytearray]:
     """Encode a value according to a given data type."""
     encoder = TYPE_TO_ENCODER[dtype]
     return encoder(value) if encoder is not None else None
+
+
+def get_msg(values: List[Any], types: List[int]) -> bytearray:
+    return bytearray(chain(*[encode_value(value, value_type) for value, value_type in zip(values, types)]))
