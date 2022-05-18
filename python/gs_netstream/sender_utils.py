@@ -7,6 +7,9 @@ from .constants import *
 import numpy as np
 
 
+ENCODING_SIZES = np.array([1 << 7, 1 << 14, 1 << 21, 1 << 28, 1 << 35, 1 << 42, 1 << 49, 1 << 56])
+
+
 def encoding_size(value: int) -> int:
     """Computes the encoding size of a value."""
     dist = (ENCODING_SIZES - value) <= 0
@@ -102,7 +105,7 @@ TYPE_TO_ENCODER = {
 
 def encode_value(value: Any, dtype: int) -> Optional[bytearray]:
     """Encode a value according to a given data type."""
-    encoder = TYPE_TO_ENCODER[dtype]
+    encoder = TYPE_TO_ENCODER.get(dtype, None)
     return encoder(value) if encoder is not None else None
 
 

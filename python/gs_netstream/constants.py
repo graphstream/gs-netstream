@@ -203,10 +203,3 @@ An type-unspecified array. Followed by first, a
 themselves. The elements themselves have to give their type.
 """
 TYPE_ARRAY = 0x60
-
-
-#########################
-# Utils constants
-#########################
-import numpy as np
-ENCODING_SIZES = np.array([1 << 7, 1 << 14, 1 << 21, 1 << 28, 1 << 35, 1 << 42, 1 << 49, 1 << 56])
