@@ -14,16 +14,34 @@
 #define NETSTREAM_SENDER_H
 
 
-
-
 #ifndef WIN32
   #include <unistd.h>
 #else
   #include <windows.h>
 #endif
 
+#include <sys/cdefs.h>
+#define STATIC_ASSERT(condition) typedef char __static_assert##__LINE__[(condition)?1:-1]
 
 #include <iostream>
+
+#ifdef _WIN32
+STATIC_ASSERT(sizeof(short)==sizeof(int16_t));
+STATIC_ASSERT(sizeof(int)==sizeof(int32_t));
+STATIC_ASSERT(sizeof(long)==sizeof(int32_t));
+STATIC_ASSERT(sizeof(long long)==sizeof(int64_t));
+STATIC_ASSERT(sizeof(void*)==sizeof(int64_t));
+#define GS_LONG long long
+#else
+STATIC_ASSERT(sizeof(short)==sizeof(int16_t));
+STATIC_ASSERT(sizeof(int)==sizeof(int32_t));
+STATIC_ASSERT(sizeof(long)==sizeof(int64_t));
+STATIC_ASSERT(sizeof(long long)==sizeof(int64_t));
+STATIC_ASSERT(sizeof(void*)==sizeof(int64_t));
+#define GS_LONG long
+#endif
+
+#define GS_STRINGIFY(VAR) #VAR
 
 #include "netstream-storage.h"
 #include "netstream-socket.h"
@@ -59,15 +77,19 @@ protected:
 
   int _getType(char object);
   int _getType(bool object);
+  int _getType(short object);
   int _getType(int object);
   int _getType(long object);
+  int _getType(long long object);
   int _getType(float object);
   int _getType(double object);
   int _getType(const string & object);
   int _getType( const vector<char> & object);
   int _getType( const vector<bool> & object);
+  int _getType( const vector<short> & object);
   int _getType( const vector<int> & object);
   int _getType( const vector<long> & object);
+  int _getType( const vector<long long> & object);
   int _getType( const vector<float> & object);
   int _getType( const vector<double> & object);
 
@@ -81,18 +103,22 @@ protected:
   }
   void _encode(NetStreamStorage & event, char value);
   void _encode(NetStreamStorage & event, bool value);
+  void _encode(NetStreamStorage & event, short value);
   void _encode(NetStreamStorage & event, int value);
   void _encode(NetStreamStorage & event, long value);
+  void _encode(NetStreamStorage & event, long long value);  
   void _encode(NetStreamStorage & event, float value);
   void _encode(NetStreamStorage & event, double value);
   void _encode(NetStreamStorage & event, const string & value);
   
   void _encode(NetStreamStorage & event, const vector<char> & value);
   void _encode(NetStreamStorage & event, const vector<bool> & value);
+  void _encode(NetStreamStorage & event, const vector<short> & value);
   void _encode(NetStreamStorage & event, const vector<int> & value);
-  void _encode(NetStreamStorage & event, const vector <long> & value);
-  void _encode(NetStreamStorage & event, const vector <float> & value);
-  void _encode(NetStreamStorage & event, const vector <double> & value);
+  void _encode(NetStreamStorage & event, const vector<long> & value);
+  void _encode(NetStreamStorage & event, const vector<long long> & value);  
+  void _encode(NetStreamStorage & event, const vector<float> & value);
+  void _encode(NetStreamStorage & event, const vector<double> & value);
   
   
   void _sendEvent(NetStreamStorage &);

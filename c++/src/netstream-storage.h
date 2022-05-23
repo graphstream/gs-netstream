@@ -41,7 +41,7 @@ private:
 	void init();
 
 	/// Check if the next \p num bytes can be read safely
-	void checkReadSafe(unsigned int num) const throw(std::invalid_argument);
+	void checkReadSafe(unsigned int num) const;
 	/// Read a byte \em without validity check
 	unsigned char readCharUnsafe();
 	/// Write \p size elements of array \p begin according to endianess
@@ -68,42 +68,45 @@ public:
 	void reset();
 
 	virtual size_t varintSize(uint_fast64_t);
-	virtual uint_fast64_t readUnsignedVarint() throw(std::invalid_argument);
-	virtual void writeUnsignedVarint(uint_fast64_t) throw(std::invalid_argument);
+	virtual uint_fast64_t readUnsignedVarint() ;
+	virtual void writeUnsignedVarint(uint_fast64_t) ;
 
-	virtual int_fast64_t readVarint() throw(std::invalid_argument);
-	virtual void writeVarint(int_fast64_t) throw(std::invalid_argument);
+	virtual int_fast64_t readVarint() ;
+	virtual void writeVarint(int_fast64_t) ;
 
-	virtual unsigned char readChar() throw(std::invalid_argument);
-	virtual void writeChar(unsigned char) throw();
+	virtual unsigned char readChar() ;
+	virtual void writeChar(unsigned char) ;
 
-	virtual int readByte() throw(std::invalid_argument);
-	virtual void writeByte(int) throw(std::invalid_argument);
-//	virtual void writeByte(unsigned char) throw();
+	virtual int readByte() ;
+	virtual void writeByte(int) ;
+//	virtual void writeByte(unsigned char) ;
 
-	virtual int readUnsignedByte() throw(std::invalid_argument);
-	virtual void writeUnsignedByte(int) throw(std::invalid_argument);
+	virtual int readUnsignedByte() ;
+	virtual void writeUnsignedByte(int) ;
 
-	virtual std::string readString() throw(std::invalid_argument);
-	virtual void writeString(const std::string& s) throw();
+	virtual std::string readString() ;
+	virtual void writeString(const std::string& s) ;
 
-	virtual std::vector<std::string> readStringList() throw(std::invalid_argument);
-	virtual void writeStringList(const std::vector<std::string> &s) throw();
+	virtual std::vector<std::string> readStringList() ;
+	virtual void writeStringList(const std::vector<std::string> &s) ;
 
-	virtual int readShort() throw(std::invalid_argument);
-	virtual void writeShort(int) throw(std::invalid_argument);
+	virtual int readShort() ;
+	virtual void writeShort(int) ;
 
-	virtual int readInt() throw(std::invalid_argument);
-	virtual void writeInt(int) throw();
+	virtual int readInt() ;
+	virtual void writeInt(int) ;
 
-	virtual long readLong() throw(std::invalid_argument);
-	virtual void writeLong(long) throw();
+	virtual long readLong() ;
+	virtual void writeLong(long) ;
 
-	virtual float readFloat() throw(std::invalid_argument);
-	virtual void writeFloat( float ) throw();
+	virtual long long readLongLong() ;
+	virtual void writeLongLong(long long) ;
 
-	virtual double readDouble() throw(std::invalid_argument);
-	virtual void writeDouble( double ) throw();
+	virtual float readFloat() ;
+	virtual void writeFloat( float ) ;
+
+	virtual double readDouble() ;
+	virtual void writeDouble( double ) ;
 
 	virtual void writePacket(unsigned char* packet, int length);
 

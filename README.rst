@@ -22,4 +22,9 @@ check the `manual`_ for a full description of the protocol
 
 .. _manual: https://github.com/graphstream/gs-netstream/wiki/NetStream-Manual
 
+Building for C++
+----------------
 
+For C++, you can build gs-netstream using the code in the `c++` directory. Just run 'make'.
+
+This has been tested to build with gcc 11.2.0 on MSYS2 (as of Nov 2021) and with gcc 9.3 on Ubuntu 20.04. Only building was tested.

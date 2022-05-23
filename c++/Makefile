@@ -18,7 +18,8 @@ CDBG = -g $(CWARN) -fno-inline
 CFLAGS = -I$(INCDIR) -O3 
 DFLAGS = -I$(INCDIR) -g $(CWARN) -fno-inline -DDEBUG=1
 
-ifeq ($(shell uname),MINGW32_NT-6.1)
+# https://stackoverflow.com/questions/714100/os-detecting-makefile
+ifeq ($(OS),Windows_NT)
 	SOCKET_LIB = -lwsock32
 else
 	SOCKET_LIB = 

@@ -26,8 +26,8 @@
 #endif
 
 // Disable exception handling warnings
-#ifdef WIN32
-	#pragma warning( disable : 4290 )
+#ifdef _WIN32
+# pragma warning( disable : 4290 )
 #endif
 
 #include <string>
@@ -48,18 +48,18 @@ namespace netstream
 	private:
 		std::string what_;
 	public:
-		NetStreamSocketException( std::string what ) throw() 
+		NetStreamSocketException( std::string what )
 		{
 			what_ = what;
 			//std::cerr << "netstream::NetStreamSocketException: " << what << std::endl << std::flush;
 		}
 
-		virtual const char* what() const throw()
+		virtual const char* what() const noexcept
 		{
 			return what_.c_str();
 		}
 
-		~NetStreamSocketException() throw() {}
+		~NetStreamSocketException() {}
 	};
 
 	class NetStreamSocket
@@ -76,18 +76,18 @@ namespace netstream
 		~NetStreamSocket();
 
 		/// Connects to host_:port_
-		void connect() throw( NetStreamSocketException );
+		void connect();
 
 		/// Wait for a incoming connection to port_
-		void accept() throw( NetStreamSocketException );
-		void send( const std::vector<unsigned char> ) throw( NetStreamSocketException );
-		void sendExact( const NetStreamStorage & ) throw( NetStreamSocketException );
-		std::vector<unsigned char> receive( int bufSize = 2048 ) throw( NetStreamSocketException );
-		bool receiveExact( NetStreamStorage &) throw( NetStreamSocketException );
+		void accept();
+		void send( const std::vector<unsigned char> ) ;
+		void sendExact( const NetStreamStorage & ) ;
+		std::vector<unsigned char> receive( int bufSize = 2048 ) ;
+		bool receiveExact( NetStreamStorage &) ;
 		void close();
 		int port();
-		void set_blocking(bool) throw( NetStreamSocketException );
-		bool is_blocking() throw();
+		void set_blocking(bool) ;
+		bool is_blocking() ;
 		bool has_client_connection() const;
 
 		// If verbose, each send and received data is written to stderr
@@ -96,12 +96,12 @@ namespace netstream
 
 	private:
 		void init();
-		void BailOnNetStreamSocketError( std::string ) const throw( NetStreamSocketException );
-#ifdef WIN32
+		void BailOnNetStreamSocketError( std::string ) const ;
+#ifdef _WIN32
 		std::string GetWinsockErrorString(int err) const;
 #endif
 		bool atoaddr(std::string, struct in_addr& addr);
-		bool datawaiting(int sock) const throw();
+		bool datawaiting(int sock) const ;
 
 		std::string host_;
 		int port_;
@@ -110,7 +110,7 @@ namespace netstream
 		bool blocking_;
 
 		bool verbose_;
-#ifdef WIN32
+#ifdef _WIN32
 		static bool init_windows_sockets_;
 		static bool windows_sockets_initialized_;
 		static int instance_count_;
@@ -121,11 +121,4 @@ namespace netstream
 
 #endif // BUILD_TCPIP
 
-
-/*-----------------------------------------------------------------------
-* Source  $Source: $
-* Version $Revision: 197 $
-* Date    $Date: 2008-04-29 17:40:51 +0200 (Tue, 29 Apr 2008) $
-*-----------------------------------------------------------------------
-* $Log:$
-*-----------------------------------------------------------------------*/
+// vim: ts=4:sw=4:noet
